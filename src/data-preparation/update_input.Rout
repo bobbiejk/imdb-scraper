@@ -1,0 +1,37 @@
+
+R version 4.0.2 (2020-06-22) -- "Taking Off Again"
+Copyright (C) 2020 The R Foundation for Statistical Computing
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> # make directory
+> dir.create("gen")
+> dir.create("gen/data-preparation")
+> dir.create("gen/data-preparation/input")
+> 
+> # copy the raw data into input folder
+> file.copy("./data/imdb/content.csv", "./gen/data-preparation/input/content.csv")
+[1] TRUE
+> file.copy("./data/imdb/distributors.csv", "./gen/data-preparation/input/distributors.csv")
+[1] TRUE
+> file.copy("./data/imdb/producers.csv", "./gen/data-preparation/input/producers.csv")
+[1] TRUE
+> file.copy("./data/trakt/watched.csv", "./gen/data-preparation/input/watched.csv")
+[1] FALSE
+> 
+> proc.time()
+   user  system elapsed 
+   0.21    0.06    0.25 
