@@ -155,7 +155,6 @@ def make_content_csv(content):
             directory.
     ''' 
    # make sure right directory has been set
-   # os.chdir("thesis")
     print(os.getcwd())
     
     # check whether file location exists
@@ -213,6 +212,7 @@ def extract_review_data(content_urls):
             review_data.append({"date": review_date,
                                 "rating": review_rating})
 
+        # TODO
         # need to click on load more in order to extract all reviews
 
         sleep(2)
@@ -355,7 +355,6 @@ def make_producers_csv(company_credits):
             stored in ../data/imdb/ directory
     ''' 
    # make sure right directory has been set
-   # os.chdir("thesis")
     print(os.getcwd())
     
     # check whether file location exists
@@ -400,7 +399,6 @@ def make_distributor_csv(company_credits):
             hence this id has 5 entries.
     ''' 
    # make sure right directory has been set
-   # os.chdir("thesis")
     print(os.getcwd())
     
     # check whether file location exists
@@ -428,4 +426,3 @@ def make_distributor_csv(company_credits):
     return 
 
 make_distributor_csv(company_credits)
-
