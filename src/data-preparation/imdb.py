@@ -184,7 +184,7 @@ make_content_csv(content)
 
 def extract_review_data(content_urls):
 
-    ''' Collects review dates of all content
+    ''' Collects review date and review rating of all content
         
         Args:
             content_urls: Output of extract_content_urls(page_urls)
@@ -196,31 +196,100 @@ def extract_review_data(content_urls):
             weekly overview to find the rate at which popularity decreases
     '''
 
+    driver = webdriver.Chrome()
+
     for content in content_urls:
         
+        content_id = content["id"]
+
         # reviews that are sorted by submission date
         reviews_url = content["url"] + "reviews" + "/?sort=submissionDate&dir=desc&rating"
-        request_reviews = requests.get(reviews_url)
-        soup = BeautifulSoup(request_reviews.text, "html.parser")
+        
+        driver.get(reviews_url)
+        sleep(5)
 
+        request = driver.page_source.encode("utf-8")
+        soup = BeautifulSoup(request, "html.parser")
+
+        # click on all load more buttons
+        while True:
+            # check whether there is a button
+            try:
+                button_data = driver.find_elements_by_class_name("ipl-load-more__button")
+                button = button_data[0]
+            except IndexError:
+                break
+            # check whether there is a clickable button
+            try:
+                button.click()
+            except WebDriverException:
+                break
+            
+            request = driver.page_source.encode("utf-8")
+            soup = BeautifulSoup(request, "html.parser")
+            sleep(2)    
+    
         review_container = soup.find_all(class_="lister-item mode-detail imdb-user-review collapsable")
+        
         review_data = []
-
+        
         for review_item in review_container:
             review_date = review_item.find(class_ = "review-date").get_text()
-            review_rating = review_item.find(class_="rating-other-user-rating").text.strip()
-            review_data.append({"date": review_date,
+            review_rating_data = review_item.find(class_="rating-other-user-rating")
+            if review_rating_data:
+                review_rating = review_rating_data.text.strip()
+            else:
+                review_rating = ""
+            
+            review_data.append({"id": content_id,  
+                                "date": review_date,
                                 "rating": review_rating})
 
-        # TODO
-        # need to click on load more in order to extract all reviews
-
-        sleep(2)
+        sleep(5)
 
     return review_data
 
-#review_data = extract_review_data(content_urls[:2])
-#print(review_data)
+review_data = extract_review_data(content_urls[:2])
+print(review_data)
+
+def make_reviews_csv(review_data):
+
+    ''' Creates CSV file of reviews per IMDb id
+    
+        Args:
+            review_data: Output of extract_review_data(content_urls)
+    
+        Returns:
+            CSV file consisting of IMDb id, review data and review rating.
+            Each IMDb id may have several entries depending on the number
+            of reviews that IMDb id has. CSV is stored in ../data/imdb/ 
+            directory
+    ''' 
+   # make sure right directory has been set
+    print(os.getcwd())
+    
+    # check whether file location exists
+    dirname = "data/imdb"
+    try:
+        os.makedirs(dirname)
+        print("Directory has been created")
+    except FileExistsError:
+        print("Directory already exists") 
+
+    if os.path.isfile("data/imdb/reviews.csv") == False:
+        with open("data/imdb/reviews.csv", "a") as csv_file:
+            writer = csv.writer(csv_file, delimiter=";")
+            writer.writerow(["id", "review_data", "review_rating"])
+       
+    with open("data/imdb/reviews.csv", "a") as csv_file:
+        writer = csv.writer(csv_file, delimiter=";")
+        for review in review_data:
+            writer.writerow([review['id'], review['date'], review['rating']])
+    print("done!")
+
+    return 
+
+make_reviews_csv(review_data)
 
 def extract_company_data(content_urls):
 
