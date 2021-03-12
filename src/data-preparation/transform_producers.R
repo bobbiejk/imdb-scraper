@@ -25,7 +25,7 @@ originals <- function(){
 originals_df  <- originals()
 
 # create directory
-dir.create("./gens/data-preparation/temp")
+dir.create("./gen/data-preparation/temp")
 
 # save transformed data
 save(originals_df, file= "./gen/data-preparation/temp/transform_producers.RData")
