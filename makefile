@@ -19,9 +19,4 @@ gen/data-preparation/input/distributors.csv: data/imdb/distributors.csv
 # Download the datasets
 data/imdb/producers.csv data/imdb/distributors.csv data/imdb/content.csv: src/data-preparation/imdb.py
 	python src/data-preparation/imdb.py
-
-data/trakt/watched.csv: src/data-preparation/unique_data.R \
-			src/data-preparation/trakt.py
-	R CMD BATCH src/data-preparation/unique_data.R
-	python src/data-preparation/trakt.py
 	
