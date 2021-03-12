@@ -4,6 +4,9 @@ from time import sleep
 import requests
 import csv 
 import os
+from selenium import webdriver
+from selenium.common.exceptions import WebDriverException
+
 
 # seeds that start at the base of distributor content
 distributor_base_urls = {
