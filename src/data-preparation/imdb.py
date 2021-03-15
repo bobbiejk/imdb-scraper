@@ -34,20 +34,21 @@ def generate_page_urls(base_url, num_pages):
     counter_content = 1
     for counter in range(1,num_pages+1):
 
-        #make sure that is alphabetically sorted, ascending
+        #make sure that is alphabetically sorted, ascending, per 250 items
         sort_alpha = "&sort=alpha,asc"
         start_at = "&start=" + str(counter_content)
+        count = "&count=250"
 
         #assemble full url
         full_url = base_url + sort_alpha + start_at
         page_urls.append(full_url)
 
-        #make sure that next page shows next 50 content
-        counter_content += 50
+        #make sure that next page shows next 250 content
+        counter_content += 250
 
     return page_urls
 
-page_urls = generate_page_urls(distributor_base_urls["Netflix"],1)
+page_urls = generate_page_urls(distributor_base_urls["Netflix"],5)
 print(page_urls)
 
 def extract_content_urls(page_urls):
@@ -88,7 +89,6 @@ def extract_content_urls(page_urls):
     return content_urls
 
 content_urls = extract_content_urls(page_urls)
-print(content_urls[:2])
 
 def extract_content_data(content_urls):
 
@@ -140,6 +140,8 @@ def extract_content_data(content_urls):
                         "country": country,
                         "stars": stars,
                         "genres": genres})
+
+        print()
 
     return content
 
