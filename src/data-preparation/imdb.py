@@ -107,17 +107,37 @@ def extract_content_data(content_urls):
 
     for content_url in content_urls:
         url = content_url["url"]
+        print(url)
         request = requests.get(url)
         soup = BeautifulSoup(request.text, "html.parser")
 
-        duration = soup.find(class_="title_wrapper").find("time").get_text().replace("\n","").replace(" ","")
-        country = soup.find(id="titleDetails").find_all("a")[2].get_text()
-        
+        find_duration = soup.find(class_="title_wrapper").find("time")
+
+        if find_duration:
+            duration = find_duration.get_text().replace("\n","").replace(" ","")
+        else:
+            duration = ''
+
+        find_details = soup.find(id="titleDetails")
+        if find_details: 
+            find_country = find_details.find_all("a")
+            if find_country:
+                country_data = find_country[2]
+                if country_data:
+                    country = country_data.get_text()
+        else:
+            continue
+            print(f'This {url} is in production')
+            
         genres = []
 
-        find_genres = soup.find_all(class_="see-more inline canwrap")[1]
-        if find_genres:
-            genre_list = find_genres.find_all("a")
+        find_genres = soup.find_all(class_="see-more inline canwrap")
+        if find_genres: 
+            if len(find_genres) > 1: 
+                genre_data = find_genres[1]
+            else:
+                genre_data = find_genres[0]
+            genre_list = genre_data.find_all("a")
             for genre_item in genre_list:
                 genre = genre_item.get_text().replace(" ","")
                 genres.append(genre)
@@ -145,7 +165,7 @@ def extract_content_data(content_urls):
 
     return content
 
-content = extract_content_data(content_urls[:2])
+content = extract_content_data(content_urls)
 
 def make_content_csv(content):
 
@@ -171,14 +191,14 @@ def make_content_csv(content):
         print("Directory already exists") 
 
     if os.path.isfile("data/imdb/content.csv") == False:
-        with open("data/imdb/content.csv", "a") as csv_file:
+        with open("data/imdb/content.csv", "a", newline='') as csv_file:
             writer = csv.writer(csv_file, delimiter=";")
             writer.writerow(["id", "title",
                              "duration", "country",
                              "stars", "genres"])
        
     with open("data/imdb/content.csv", "a") as csv_file:
-        writer = csv.writer(csv_file, delimiter=";")
+        writer = csv.writer(csv_file, delimiter=";", newline='')
         for row in content:
             writer.writerow([row['id'], row['title'], row['duration'], row['country'], row['stars'], row['genres']])
     print("done!")
@@ -206,12 +226,12 @@ def extract_review_data(content_urls):
     for content in content_urls:
         
         content_id = content["id"]
-
+        print(content_id)
         # reviews that are sorted by submission date
         reviews_url = content["url"] + "reviews" + "/?sort=submissionDate&dir=desc&rating"
         
         driver.get(reviews_url)
-        sleep(5)
+        sleep(3)
 
         request = driver.page_source.encode("utf-8")
         soup = BeautifulSoup(request, "html.parser")
@@ -250,12 +270,11 @@ def extract_review_data(content_urls):
                                 "date": review_date,
                                 "rating": review_rating})
 
-        sleep(5)
+        
 
     return review_data
 
-review_data = extract_review_data(content_urls[:2])
-print(review_data)
+review_data = extract_review_data(content_urls)
 
 def make_reviews_csv(review_data):
 
@@ -282,11 +301,11 @@ def make_reviews_csv(review_data):
         print("Directory already exists") 
 
     if os.path.isfile("data/imdb/reviews.csv") == False:
-        with open("data/imdb/reviews.csv", "a") as csv_file:
+        with open("data/imdb/reviews.csv", "a", newline='') as csv_file:
             writer = csv.writer(csv_file, delimiter=";")
             writer.writerow(["id", "review_data", "review_rating"])
        
-    with open("data/imdb/reviews.csv", "a") as csv_file:
+    with open("data/imdb/reviews.csv", "a", newline='') as csv_file:
         writer = csv.writer(csv_file, delimiter=";")
         for review in review_data:
             writer.writerow([review['id'], review['date'], review['rating']])
@@ -325,6 +344,7 @@ def extract_company_data(content_urls):
 
         # id of each content extracted from content_urls
         content_id = content["id"]
+        print(content_id)
 
         # create list for production companies for content
         production_companies = []
@@ -354,13 +374,14 @@ def extract_company_data(content_urls):
             
             for distributor_item in distributor_list:
                 distributor_name = distributor_item.find("a").get_text()
+                length_name = len(distributor_name)
                 
                 # distributor_info needs to be cleaned to extract year, country and type(s)
-                distributor_info = distributor_item.get_text().strip("\n"+distributor_name)
+                distributor_info = distributor_item.get_text()[length_name:]
                 
                 # check whether first item in distributor_info is year
                 distributor_year = ""
-                first_item = distributor_info.split()[0]
+                first_item = distributor_info.split('(')[1]
                 
                 for character in first_item:
                     if character.isdigit() or character == "-":
@@ -412,7 +433,7 @@ def extract_company_data(content_urls):
                                 "distributors":distributors})
                                 
         sleep(2)
-        
+       
     return company_credits
 
 company_credits = extract_company_data(content_urls)
@@ -440,11 +461,11 @@ def make_producers_csv(company_credits):
         print("Directory already exists") 
 
     if os.path.isfile("data/imdb/producers.csv") == False:
-        with open("data/imdb/producers.csv", "a") as csv_file:
+        with open("data/imdb/producers.csv", "a", newline='') as csv_file:
             writer = csv.writer(csv_file, delimiter=";")
             writer.writerow(["id", "producer"])
        
-    with open("data/imdb/producers.csv", "a") as csv_file:
+    with open("data/imdb/producers.csv", "a", newline='') as csv_file:
         writer = csv.writer(csv_file, delimiter=";")
         for credit in company_credits:
             # currently producers is set to a list, so each instance is a id
@@ -484,13 +505,13 @@ def make_distributor_csv(company_credits):
         print("Directory already exists") 
 
     if os.path.isfile("data/imdb/distributors.csv") == False:
-        with open("data/imdb/distributors.csv", "a") as csv_file:
+        with open("data/imdb/distributors.csv", "a", newline='') as csv_file:
             writer = csv.writer(csv_file, delimiter=";")
             writer.writerow(["id", "distributor_name",
                              "distributor_type", "distributor_country",
                              "distributor_start_year", "distributor_end_year"])
        
-    with open("data/imdb/distributors.csv", "a") as csv_file:
+    with open("data/imdb/distributors.csv", "a", newline='') as csv_file:
         writer = csv.writer(csv_file, delimiter=";")
         for credit in company_credits:
             for distributor in credit["distributors"]:
