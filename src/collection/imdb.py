@@ -33,17 +33,19 @@ def generate_page_urls(base_url, num_pages):
     counter_content = 1
     for counter in range(1,num_pages+1):
 
-        #make sure that is alphabetically sorted, ascending, per 250 items
+        #make sure that is alphabetically sorted, ascending, per 50 items
         sort_alpha = "&sort=alpha,asc"
         start_at = "&start=" + str(counter_content)
-        count = "&count=250"
+        count = "&count=50"
 
         #assemble full url
-        full_url = base_url + sort_alpha + start_at
+        full_url = base_url + sort_alpha + start_at + count
         page_urls.append(full_url)
 
-        #make sure that next page shows next 250 content
+        #make sure that next page shows next 50 content
         counter_content += 250
+
+        sleep(2)
 
     return page_urls
 
@@ -84,6 +86,9 @@ def extract_content_urls(page_urls):
                 continue
 
         sleep(2)
+        
+        # know how many items have been added to dictionary per page url
+        print(len(content_urls))
 
     return content_urls
 
@@ -291,6 +296,7 @@ def make_reviews_csv(review_data):
     ''' 
    # make sure right directory has been set
     print(os.getcwd())
+    os.chdir('../../')
 
     # check whether file location exists
     dirname = "data/imdb"
@@ -452,6 +458,7 @@ def make_producers_csv(company_credits):
     ''' 
    # make sure right directory has been set
     print(os.getcwd())
+    os.chdir('../../')
     
     # check whether file location exists
     dirname = "data/imdb"
@@ -496,6 +503,7 @@ def make_distributor_csv(company_credits):
     ''' 
    # make sure right directory has been set
     print(os.getcwd())
+    os.chdir('../../')
     
     # check whether file location exists
     dirname = "data/imdb"
