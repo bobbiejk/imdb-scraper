@@ -36,7 +36,7 @@ def generate_page_urls(base_url, num_pages):
         #make sure that is alphabetically sorted, ascending, per 50 items
         sort_alpha = "&sort=alpha,asc"
         start_at = "&start=" + str(counter_content)
-        count = "&count=50"
+        count = "&count=250"
 
         #assemble full url
         full_url = base_url + sort_alpha + start_at + count
