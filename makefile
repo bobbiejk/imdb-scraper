@@ -7,16 +7,11 @@ merge: gen/data-preparation/output/data_imdb_merged.RData
 # Transform data
 
 gen/data-preparation/output/data_imdb_merged.RData: src/data-preparation/merge_imdb_data.R
-	R CMD BATCH src/data-preparation/merge_imdb_data.R
+	RScript src/data-preparation/merge_imdb_data.R
 
 gen/data-preparation/temp/transform_distributors.RData gen/data-preparation/temp/transform_producers.RData: gen/data-preparation/input/distributors.csv 
-	R CMD BATCH src/data-preparation/transform_distributors.R
-	R CMD BATCH src/data-preparation/transform_producers.R
+	RScript src/data-preparation/transform_distributors.R
+	RScript src/data-preparation/transform_producers.R
 
 gen/data-preparation/input/distributors.csv: data/imdb/distributors.csv
-	R CMD BATCH src/data-preparation/update_input.R
-
-# Download the datasets
-data/imdb/producers.csv data/imdb/distributors.csv data/imdb/content.csv: src/data-preparation/imdb.py
-	python src/data-preparation/imdb.py
-	
+	RScript src/data-preparation/update_input.R
