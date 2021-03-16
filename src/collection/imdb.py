@@ -30,7 +30,7 @@ def generate_page_urls(base_url, num_pages):
 
     page_urls = []
 
-    counter_content = 1
+    counter_content = 7501
     for counter in range(1,num_pages+1):
 
         #make sure that is alphabetically sorted, ascending, per 50 items
@@ -115,26 +115,38 @@ def extract_content_data(content_urls):
         request = requests.get(url)
         soup = BeautifulSoup(request.text, "html.parser")
 
-        find_duration = soup.find(class_="title_wrapper").find("time")
+        # set duration to empty
+        duration = ""
 
+        # check whether duration exists
+        find_duration = soup.find(class_="title_wrapper").find("time")
         if find_duration:
             duration = find_duration.get_text().replace("\n","").replace(" ","")
-        else:
-            duration = ''
-
+        
+        # set country to empty
+        country = ""
+        
+        # check whether movie details exists
         find_details = soup.find(id="titleDetails")
         if find_details: 
+
+            # check whether country exists
             find_country = find_details.find_all("a")
             if find_country:
-                country_data = find_country[2]
-                if country_data:
-                    country = country_data.get_text()
+                if len(find_country) > 2:
+                    country_data = find_country[2]
+                    if country_data:
+                        country = country_data.get_text()
+        
+        # if movie details not exist
         else:
-            continue
             print(f'This {url} is in production')
-            
+            continue
+        
+        # set genres to empty list
         genres = []
 
+        # check whether genres exist
         find_genres = soup.find_all(class_="see-more inline canwrap")
         if find_genres: 
             if len(find_genres) > 1: 
@@ -146,8 +158,10 @@ def extract_content_data(content_urls):
                 genre = genre_item.get_text().replace(" ","")
                 genres.append(genre)
 
+        # set starts to empty list
         stars = []
 
+        # check whether stars exists
         find_stars = soup.find(class_="credit_summary_item")
         if find_stars:
             stars_list = find_stars.find_all("a")
