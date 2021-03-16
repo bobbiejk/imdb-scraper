@@ -48,8 +48,8 @@ def generate_page_urls(base_url, num_pages):
 
     return page_urls
 
-page_urls = generate_page_urls(distributor_base_urls["Netflix"],5)
-print(page_urls)
+#page_urls = generate_page_urls(distributor_base_urls["Netflix"],5)
+#print(page_urls)
 
 def extract_content_urls(page_urls):
 
@@ -88,7 +88,7 @@ def extract_content_urls(page_urls):
 
     return content_urls
 
-content_urls = extract_content_urls(page_urls)
+#content_urls = extract_content_urls(page_urls)
 
 def extract_content_data(content_urls):
 
@@ -165,7 +165,7 @@ def extract_content_data(content_urls):
 
     return content
 
-content = extract_content_data(content_urls)
+#content = extract_content_data(content_urls)
 
 def make_content_csv(content):
 
@@ -205,7 +205,9 @@ def make_content_csv(content):
 
     return 
 
-make_content_csv(content)
+#make_content_csv(content)
+
+content_urls = [{"id":"tt7078180" , "url": "https://www.imdb.com/title/tt7078180/" }, {"id": "tt7263154" , "url":"https://www.imdb.com/title/tt7263154/" }]
 
 def extract_review_data(content_urls):
 
@@ -222,6 +224,8 @@ def extract_review_data(content_urls):
     '''
 
     driver = webdriver.Chrome()
+
+    review_data = []
 
     for content in content_urls:
         
@@ -256,8 +260,6 @@ def extract_review_data(content_urls):
     
         review_container = soup.find_all(class_="lister-item mode-detail imdb-user-review collapsable")
         
-        review_data = []
-        
         for review_item in review_container:
             review_date = review_item.find(class_ = "review-date").get_text()
             review_rating_data = review_item.find(class_="rating-other-user-rating")
@@ -275,6 +277,7 @@ def extract_review_data(content_urls):
     return review_data
 
 review_data = extract_review_data(content_urls)
+print(review_data)
 
 def make_reviews_csv(review_data):
 
@@ -308,12 +311,13 @@ def make_reviews_csv(review_data):
     with open("data/imdb/reviews.csv", "a", newline='') as csv_file:
         writer = csv.writer(csv_file, delimiter=";")
         for review in review_data:
+            print(review)
             writer.writerow([review['id'], review['date'], review['rating']])
     print("done!")
 
     return 
 
-make_reviews_csv(review_data)
+#make_reviews_csv(review_data)
 
 def extract_company_data(content_urls):
 
@@ -436,7 +440,7 @@ def extract_company_data(content_urls):
        
     return company_credits
 
-company_credits = extract_company_data(content_urls)
+#company_credits = extract_company_data(content_urls)
 
 def make_producers_csv(company_credits):
 
@@ -476,7 +480,7 @@ def make_producers_csv(company_credits):
 
     return 
 
-make_producers_csv(company_credits)
+#make_producers_csv(company_credits)
 
 def make_distributor_csv(company_credits):
 
@@ -520,4 +524,4 @@ def make_distributor_csv(company_credits):
 
     return 
 
-make_distributor_csv(company_credits)
+#make_distributor_csv(company_credits)
