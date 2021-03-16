@@ -197,8 +197,8 @@ def make_content_csv(content):
                              "duration", "country",
                              "stars", "genres"])
        
-    with open("data/imdb/content.csv", "a") as csv_file:
-        writer = csv.writer(csv_file, delimiter=";", newline='')
+    with open("data/imdb/content.csv", "a", newline='') as csv_file:
+        writer = csv.writer(csv_file, delimiter=";")
         for row in content:
             writer.writerow([row['id'], row['title'], row['duration'], row['country'], row['stars'], row['genres']])
     print("done!")
