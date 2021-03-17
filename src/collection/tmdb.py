@@ -15,7 +15,7 @@ def extract_content_data():
             List of dictionaries consisting of IMDb ID
     ''' 
     # opened csv file
-    with open('data/imdb/content.csv') as csv_file:
+    with open('../../data/imdb/content.csv') as csv_file:
             reader = csv.DictReader(csv_file, delimiter=';')
             content_data = list(reader)
 
@@ -42,9 +42,8 @@ def transform_imdb_in_tmdb(content_data):
     for row in content_data:
         imdb_id = row['id']
         transform_ids.append({'imdb_id':imdb_id})
-                                # { KEY : VALUE}
-                                # COLUMN NAME
 
+    # divide URL in shorter parts
     base_url = "https://api.themoviedb.org/3/" 
     api_key_url = f"?api_key={api_key}" 
     find_url = "find/"
@@ -54,6 +53,7 @@ def transform_imdb_in_tmdb(content_data):
     for row in transform_ids:
         try:
             imdb_id = row['imdb_id']
+        # needed as it may break when last line of csv is empty row
         except:
             break
 
@@ -61,16 +61,17 @@ def transform_imdb_in_tmdb(content_data):
         r = requests.get(url)
         responses = r.json() # transform request into json so that you can extract data from it
 
-        # if tv
+        # if tv then responses['tv_results'] is a filled list
         if len(responses['tv_results']) != 0:
             tmdb_id = responses['tv_results'][0]['id']
             content_type = 'tv'
 
-        # if movie
-        if len(responses['movie_results']) != 0:
+        # if movie then responses['movie_results'] is a filled list
+        elif len(responses['movie_results']) != 0:
             tmdb_id = responses['movie_results'][0]['id'] 
             content_type = 'movie'
         
+        # extend every row of transform_id with tmdb id and content type
         row.update({'tmdb_id': tmdb_id,
                     'content_type': content_type})
     
@@ -88,10 +89,13 @@ def extract_releases_data(transform_ids):
         Returns:
             List of dictionaries consisting of IMDb ID, TMDB ID,
             release dates, episode numbers and season numbers. 
-            Episode numbers and season numbers are only available
-            for TV. Only TV returns for release dates an additional
-            list of dictionaries consisting of all release dates
-            per episode.
+            Note that the API request depends on whether the content
+            type is movie or tv show. Hence, content type needs to be
+            filtered before requesting to API. Movies only have one
+            release date. TV have release dates based on the episode
+            number of a certain season. Hence, release dates for TV shows
+            are stored in a list of dictionaries, consisting of sesason
+            number, episode number and release date.
     ''' 
     base_url = "https://api.themoviedb.org/3/" 
     api_key_url = f"?api_key={api_key}" 
@@ -101,7 +105,6 @@ def extract_releases_data(transform_ids):
         release_data = []
 
         if row['content_type'] == 'movie':
-            # https://api.themoviedb.org/3/movie/{movie_id}?api_key=<<api_key>>
             movie_url = 'movie/'
             movie_id = str(row['tmdb_id'])
             url = base_url + movie_url + movie_id + api_key_url
@@ -110,10 +113,10 @@ def extract_releases_data(transform_ids):
 
             release_date = responses['release_date']
 
+            # extend row of transform id with release date
             row.update({'release_date': release_date})
 
-        else:
-            # https://api.themoviedb.org/3/tv/{tv_id}?api_key=<<api_key>> 
+        else: 
             tv_url =  'tv/'
             tv_id = str(row['tmdb_id'])
             url = base_url + tv_url + tv_id + api_key_url
@@ -122,20 +125,22 @@ def extract_releases_data(transform_ids):
 
             season_number = responses['number_of_seasons']
 
+            # get a list of all season numbers subsequentially
             season_list = []
             for i in range(season_number): 
                 season_list.append(i+1)
 
+            # for each season get the episode data
             for season_item in season_list:
-                # https://api.themoviedb.org/3/tv/{tv_id}/season/{season_number}?api_key=<<api_key>>
                 season_url = '/season/'
                 season_number = str(season_item)
                 url = base_url + tv_url + tv_id + season_url + season_number + api_key_url
                 r = requests.get(url)
                 responses = r.json()
 
-                episodes_data = responses['episodes'] # list of dictionaries
+                episodes_data = responses['episodes'] 
 
+                # for each episode in episodes data, get the episode number and air date
                 for episode_item in episodes_data:
                     episode_number = episode_item['episode_number']
                     air_date = episode_item['air_date']
@@ -144,6 +149,7 @@ def extract_releases_data(transform_ids):
                                         'episode_number': episode_number,
                                         'air_date': air_date})
 
+            # extend row of transform id with release date
             row.update({'release_date': release_data})
 
     return transform_ids
@@ -179,84 +185,18 @@ def make_releases_csv(release_dates):
     # insert values in csv file   
     with open("data/tmdb/release_dates.csv", "a", newline='') as csv_file:
         writer = csv.writer(csv_file, delimiter=";")
-        for id_item in release_dates:
+        # for row in release_dates
+        for row in release_dates:
             # if movie
-            if id_item['content_type'] == 'movie':
-                writer.writerow([id_item['imdb_id'], id_item['tmdb_id'], id_item['release_date'], 'NA', 'NA'])
+            if row['content_type'] == 'movie':
+                writer.writerow([row['imdb_id'], row['tmdb_id'], row['release_date'], 'NA', 'NA'])
             # if tv
             else:
-                for episode_id in id_item['release_date']:
-                    writer.writerow([id_item['imdb_id'], id_item['tmdb_id'], episode_id['air_date'], episode_id['season_number'], episode_id['episode_number']])
+                # for key in the dictionary release date
+                for item in row['release_date']:
+                    writer.writerow([row['imdb_id'], row['tmdb_id'], item['air_date'], item['season_number'], item['episode_number']])
     print("done!")
     
     return
 
 make_releases_csv(release_dates)
-
-
-
-
-
-# with open -> a to append, w to write, and r to read
-
-
-
-
-#for
-#if
-#list.append
-#dict.update  
-
-# RELEASE DATES DICTIONARY
-# # TMDB, IMDB, CONTENT TYPE, RELEASE DATA
-
-# RELEASE DATA DICTIONARY
-# # SEASON NUMBER, EPISODE NUMBER, AIR DATE
-
-
-
-
-
-
-
-            
-
-
-
-
-
-        
-
-
-# LIST OF DICTIONARIES -> DICTIONIARY -> KEY:VALUE -> [KEY] -> VALUE
-# RELEASE_DATES -> ROW -> IMDB: ####, TMDB: ###, CONTENT_TYPE: MOVIE OF TV -> [IMDB_ID] -> #####
-# A LIST SHOULD ALWAYS BE LOOPED TO EXTRACT ELEMENTS -> release_dates is a list of dictionaries, dat betekent dat elk element van de lijst een dictionary is
-# WHAT ARE THE ELEMENTS OF A LIST OF DICTIONARIES, ALL INVIDIUAL DICTIONARIES -> release_dates is elke row a dictionary
-# TO GET THE VALUE OF A KEY OF A DICTIONARY, BENOEM JE DE DICTIONARY -> ROW['KEY'] -> VALUE
-
-## YOU END UP WITH AN TMDB ID
-## NEED TO GET CONTENT TYPE
-
-## DO I GET TV_RESULTS OR MOVIE_RESULTS. if len(responses['tv_results']) == 0, then content_type = movie
-
-### Look up release data for movies
-# def release_date(tmdb_ids):
-# if content type is movie:
-# then get release date
-# get origin country
-
-## DISCOVER API > MOVIES > DETAILS
-
-
-### Look up episode air date for shows
-# def air_date(tmdb_ids):
-# if content type is tvshow
-
-## from tv api doc
-# get origin country
-# get producers
-# get number of seasons
-# get number of episodes per season
-
-## from tv episode api doc
-# get air dates per episode
