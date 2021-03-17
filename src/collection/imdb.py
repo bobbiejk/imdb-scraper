@@ -30,7 +30,7 @@ def generate_page_urls(base_url, num_pages):
 
     page_urls = []
 
-    counter_content = 7501
+    counter_content = 1
     for counter in range(1,num_pages+1):
 
         #make sure that is alphabetically sorted, ascending, per 50 items
