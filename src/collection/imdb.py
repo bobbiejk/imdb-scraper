@@ -33,7 +33,7 @@ def generate_page_urls(base_url, num_pages):
     counter_content = 1
     for counter in range(1,num_pages+1):
 
-        #make sure that is alphabetically sorted, ascending, per 50 items
+        #make sure that is alphabetically sorted, ascending, per 250 items
         sort_alpha = "&sort=alpha,asc"
         start_at = "&start=" + str(counter_content)
         count = "&count=250"
@@ -42,7 +42,7 @@ def generate_page_urls(base_url, num_pages):
         full_url = base_url + sort_alpha + start_at + count
         page_urls.append(full_url)
 
-        #make sure that next page shows next 50 content
+        #make sure that next page shows next 250 content
         counter_content += 250
 
         sleep(2)
@@ -179,7 +179,7 @@ def extract_content_data(content_urls):
                         "stars": stars,
                         "genres": genres})
 
-        print()
+        sleep(1)
 
     return content
 
@@ -197,8 +197,9 @@ def make_content_csv(content):
             stars and genres. The CSV file is stored in ../data/imdb/
             directory.
     ''' 
-   # make sure right directory has been set
+    # make sure right directory has been set
     print(os.getcwd())
+    # this ensures that all following functions are in this directory
     os.chdir('../../')
 
     # check whether file location exists
@@ -252,7 +253,8 @@ def extract_review_data(content_urls):
         reviews_url = content["url"] + "reviews" + "/?sort=submissionDate&dir=desc&rating"
         
         driver.get(reviews_url)
-        sleep(3)
+        # sleep when the scraper comes to review page
+        sleep(2)
 
         request = driver.page_source.encode("utf-8")
         soup = BeautifulSoup(request, "html.parser")
@@ -273,7 +275,9 @@ def extract_review_data(content_urls):
             
             request = driver.page_source.encode("utf-8")
             soup = BeautifulSoup(request, "html.parser")
-            sleep(2)    
+
+            # sleep when clicked on button
+            sleep(1)    
     
         review_container = soup.find_all(class_="lister-item mode-detail imdb-user-review collapsable")
         
@@ -288,9 +292,6 @@ def extract_review_data(content_urls):
             review_data.append({"id": content_id,  
                                 "date": review_date,
                                 "rating": review_rating})
-
-        
-
     return review_data
 
 review_data = extract_review_data(content_urls)
@@ -308,9 +309,8 @@ def make_reviews_csv(review_data):
             of reviews that IMDb id has. CSV is stored in ../data/imdb/ 
             directory
     ''' 
-   # make sure right directory has been set
+    # make sure right directory has been set
     print(os.getcwd())
-    os.chdir('../../')
 
     # check whether file location exists
     dirname = "data/imdb"
@@ -472,7 +472,6 @@ def make_producers_csv(company_credits):
     ''' 
    # make sure right directory has been set
     print(os.getcwd())
-    os.chdir('../../')
     
     # check whether file location exists
     dirname = "data/imdb"
@@ -517,7 +516,6 @@ def make_distributor_csv(company_credits):
     ''' 
    # make sure right directory has been set
     print(os.getcwd())
-    os.chdir('../../')
     
     # check whether file location exists
     dirname = "data/imdb"
