@@ -6,7 +6,7 @@ require(stringr)
 exclusivity <- function(){
 
   # import dataset
-  distributors <- read.csv("data/imdb/distributors.csv", sep=";")
+  distributors <- read.csv("./gen/imdb/distributors.csv", sep=";")
   
   # get unique_ids from dataset
   unique_ids = c()
