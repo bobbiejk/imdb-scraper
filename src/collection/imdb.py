@@ -183,7 +183,7 @@ def extract_content_data(content_urls):
 
     return content
 
-#content = extract_content_data(content_urls)
+content = extract_content_data(content_urls)
 
 def make_content_csv(content):
 
@@ -225,7 +225,7 @@ def make_content_csv(content):
 
     return 
 
-#make_content_csv(content)
+make_content_csv(content)
 
 def extract_company_data(content_urls):
 
