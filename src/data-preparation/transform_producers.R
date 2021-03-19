@@ -1,7 +1,14 @@
-originals <- function(){
-
+originals <- function(csv_file = "./gen/data-preparation/input/producers.csv"){
+  
+  #' Creates dummy variable whether the show is original.
+  #' Orginality is specified when a streaming service
+  #' specified in the list streaming_services is found in
+  #' the producers list
+  #' 
+  #' @param csv_file Output of data collection of producers
+  
   # import dataset
-  producers <- read.csv("./gen/data-preparation/input/producers.csv", sep=";")
+  producers <- read.csv(csv_file, sep=";")
   
   # create data frame colnames
   streaming_services <- c("Netflix", "Disney+", "Medialand")

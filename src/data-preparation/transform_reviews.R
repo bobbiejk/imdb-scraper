@@ -4,6 +4,11 @@ require(tidyquant)
 
 popularity <- function(csv_file = "./gen/data-preparation/input/reviews.csv"){
   
+  #' Aggregates reviews in weekly data after which count of reviews
+  #' and average of rating for that week is obtained.
+  #' 
+  #' @param csv_file Output of data collection of IMDb reviews
+  
   # import reviews csv
   reviews <- read.csv(csv_file, sep=";")
   
