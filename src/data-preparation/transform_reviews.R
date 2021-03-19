@@ -2,10 +2,10 @@
 require(dplyr)
 require(tidyquant)
 
-popularity <- function(){
+popularity <- function(csv_file = "./gen/data-preparation/input/reviews.csv"){
   
   # import reviews csv
-  reviews <- read.csv("./gen/data-preparation/input/reviews.csv", sep=";")
+  reviews <- read.csv(csv_file, sep=";")
   
   # set review date to actual date
   reviews$review_data <- as.Date(reviews$review_data, "%d %B %Y")
