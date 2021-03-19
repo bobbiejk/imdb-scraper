@@ -3,10 +3,16 @@ require(dplyr)
 require(purrr)
 require(stringr)
 
-exclusivity <- function(){
-
+exclusivity <- function(csv_file = "./gen/imdb/distributors.csv"){
+  
+  #' Creates dummy variable indicating the exclusivity
+  #' of a title. Exclusivity is specified when during 
+  #' that year there is only one distributor.
+  #' 
+  #' @param csv_file Output of data collection of distributors
+  
   # import dataset
-  distributors <- read.csv("./gen/imdb/distributors.csv", sep=";")
+  distributors <- read.csv(csv_file, sep=";")
   
   # get unique_ids from dataset
   unique_ids = c()
