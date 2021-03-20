@@ -8,7 +8,7 @@ originals <- function(csv_file = "./gen/data-preparation/input/producers.csv"){
   #' @param csv_file Output of data collection of producers
   
   # import dataset
-  producers <- read.csv(csv_file, sep=";")
+  producers <- read.csv(csv_file, sep=",")
   
   # create data frame colnames
   streaming_services <- c("Netflix", "Disney+", "Medialand")

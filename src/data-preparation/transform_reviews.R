@@ -10,7 +10,7 @@ popularity <- function(csv_file = "./gen/data-preparation/input/reviews.csv"){
   #' @param csv_file Output of data collection of IMDb reviews
   
   # import reviews csv
-  reviews <- read.csv(csv_file, sep=";")
+  reviews <- read.csv(csv_file, sep=",")
   
   # set review date to actual date
   reviews$review_data <- as.Date(reviews$review_data, "%d %B %Y")

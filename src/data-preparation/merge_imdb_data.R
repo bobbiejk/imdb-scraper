@@ -4,7 +4,7 @@ require(dplyr)
 # load data associated with content
 load("./gen/data-preparation/temp/transform_producers.RData")
 load("./gen/data-preparation/temp/transform_distributors.RData")
-content_df <- read.csv("./gen/data-preparation/input/content.csv", sep = ";")
+content_df <- read.csv("./gen/data-preparation/input/content.csv", sep = ",")
 
 # merge data 
 df_imdb_merged_half <- merge(content_df, originals_df, by="id")
