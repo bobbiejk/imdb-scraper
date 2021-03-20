@@ -3,7 +3,7 @@ require(dplyr)
 require(purrr)
 require(stringr)
 
-exclusivity <- function(csv_file = "./gen/imdb/distributors.csv"){
+exclusivity <- function(csv_file = "./gen/data-preparation/input/distributors.csv"){
   
   #' Creates dummy variable indicating the exclusivity
   #' of a title. Exclusivity is specified when during 
@@ -12,7 +12,11 @@ exclusivity <- function(csv_file = "./gen/imdb/distributors.csv"){
   #' @param csv_file Output of data collection of distributors
   
   # import dataset
-  distributors <- read.csv(csv_file, sep=";")
+  distributors <- read.csv(csv_file, sep=",")
+  
+  # remove rows that include NA as this rows cannot provide information on exclusivity
+  distributors <- distributors %>%
+    na.omit()
   
   # get unique_ids from dataset
   unique_ids = c()
@@ -38,6 +42,7 @@ exclusivity <- function(csv_file = "./gen/imdb/distributors.csv"){
       if (distributors$id[row] == unique_id){
         
         start_year_row <- as.numeric(str_replace(distributors$distributor_start_year[row], "-", ""))
+        print(start_year_row)
         end_year_row <- distributors$distributor_end_year[row]
         
         if (start_year_row < start_year){
@@ -60,6 +65,7 @@ exclusivity <- function(csv_file = "./gen/imdb/distributors.csv"){
     distributor_list = list()
     
     for (row in 1:nrow(distributors)){
+
       if (exclusive_df$id[row_df] == distributors$id[row]){
         
         start_year_row <- as.numeric(str_replace(distributors$distributor_start_year[row], "-", ""))
@@ -75,15 +81,22 @@ exclusivity <- function(csv_file = "./gen/imdb/distributors.csv"){
         }
       }
     }
-    # indicate exclusivity when there is one distributor
-    exclusive <- if (length(distributor_list) == 1) 1 else 0 
-    
-    # need to transpose list in order to fit in data frame
-    distributor_t <- transpose(distributor_list)
-    
-    # add variables to data frame
-    exclusive_df$distributors[row_df] <- distributor_t
-    exclusive_df$exclusive[row_df] <- exclusive
+    # check whether the distributor list has items in it
+    if (length(distributor_list) == 0){
+      exclusive_df$distributors[row_df] <- ""
+      exclusive_df$exclusive[row_df] <- 0
+    }
+    else{
+      # indicate exclusivity when there is one distributor
+      exclusive <- if (length(distributor_list) == 1) 1 else 0 
+      
+      # need to transpose list in order to fit in data frame
+      distributor_t <- transpose(distributor_list)
+      
+      # add variables to data frame
+      exclusive_df$distributors[row_df] <- distributor_t
+      exclusive_df$exclusive[row_df] <- exclusive 
+    }
   }
   return(exclusive_df)
 }
