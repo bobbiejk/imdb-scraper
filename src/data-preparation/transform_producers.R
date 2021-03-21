@@ -20,10 +20,10 @@ originals <- function(csv_file = "./gen/data-preparation/input/producers.csv"){
   for (row in 1:nrow(producers)){
     for (streaming_service in streaming_services){
       if (grepl(streaming_service, producers[row,2]) == 1){ 
-        producers[row,original] <- 1 
+        producers$original[row] <- 1 
       }
       else{
-        producers[row, original] <- 0
+        producers$original[row] <- 0
       }
     }
   }
