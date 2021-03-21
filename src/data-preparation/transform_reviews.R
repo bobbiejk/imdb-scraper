@@ -27,7 +27,8 @@ popularity <- function(csv_file = "./gen/data-preparation/input/reviews.csv"){
     tq_transmute(select = review_count,
                  mutate_fun = apply.weekly,
                  FUN = sum,
-                 col_rename = "review_count_weekly")
+                 col_rename = "review_count_weekly",
+                 na.rm = TRUE)
   
   # aggregate rating weekly
   reviews_rating_agg <- reviews %>%
@@ -35,7 +36,8 @@ popularity <- function(csv_file = "./gen/data-preparation/input/reviews.csv"){
     tq_transmute(select = review_rating_num,
                  mutate_fun = apply.weekly,
                  FUN = mean,
-                 col_rename = "review_rating_weekly")
+                 col_rename = "review_rating_weekly",
+                 na.rm = TRUE)
   
   # merge the weekly count and the weekly rating
   reviews_merge <- merge(reviews_count_agg, reviews_rating_agg)
