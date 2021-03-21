@@ -10,18 +10,20 @@ originals <- function(csv_file = "./gen/data-preparation/input/producers.csv"){
   # import dataset
   producers <- read.csv(csv_file, sep=",")
   
-  # create data frame colnames
-  streaming_services <- c("Netflix", "Disney+", "Medialand")
-  producers[,streaming_services] <- NA
+  # in this data set, the only streaming service of interest is Netflix
+  streaming_services <- c("Netflix")
+  
+  # hence the column original stands for Netflix original
+  producers$original <- NA
   
   # check whether streaming service is in list of producers
   for (row in 1:nrow(producers)){
     for (streaming_service in streaming_services){
       if (grepl(streaming_service, producers[row,2]) == 1){ 
-        producers[row,streaming_service] <- 1 
+        producers[row,original] <- 1 
       }
       else{
-        producers[row, streaming_service] <- 0
+        producers[row, original] <- 0
       }
     }
   }
