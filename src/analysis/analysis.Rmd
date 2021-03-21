@@ -1,0 +1,63 @@
+---
+title: "Analysis of the popularity of Netflix content"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# needed packages
+require(ggplot2)
+require(dplyr)
+
+# data preparation
+
+load("./gen/analysis/input/content.RData")
+load("./gen/analysis/input/momentum.RData")
+load("./gen/analysis/input/simultaneous.RData")
+
+```
+## Netflix content library
+
+Over the years, it has become increasingly important to gain a competitive advantage by building a unique content library for all streaming services. This can be accomplished by (a) acquiring licensed, but exclusive content or (b) producing original content. The following table exhibits the number of exclusive and original titles over the years. 
+
+```{r}
+
+content_df %>%
+  group_by(year) %>%
+  filter(year >= 2007,
+         year <= 2021) %>%
+  summarise(exclusive = sum(exclusive),
+            original = sum(original))
+
+```
+
+Streaming services often go against the release strategy that is typical for linear television. That is, often on streaming services, all episodes of one show for an entire season is dropped simultaneously. In order to demonstrate this phenomena, the following table showcasts how the strategy of simultaneously dropping an entire season has been popularized over the years. 
+
+``` {r}
+
+simultaneous_df %>%
+  mutate(year = format(release_data, "%Y")) %>%
+  group_by(year) %>%
+  na.omit(season_number) %>%
+  filter(year >= "2005",
+         year <= "2021") %>%
+  summarise(simultaneous = sum(simultaneous),
+            n = n()) %>%
+  mutate(ratio = simultaneous / n)
+
+```
+
+## Reviews
+
+This analysis refers to momentum
+
+```{r}
+
+momentum_df %>%
+  ggplot(aes(x=review_data, y= review_count_weekly)) +
+  geom_line()
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
