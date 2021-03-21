@@ -87,8 +87,8 @@ exclusivity <- function(csv_file = "./gen/data-preparation/input/distributors.cs
       exclusive_df$exclusive[row_df] <- 0
     }
     else{
-      # indicate exclusivity when there is one distributor
-      exclusive <- if (length(distributor_list) == 1) 1 else 0 
+      # indicate exclusivity when there is one distributor and that distributor is Netflix
+      exclusive <- if (length(distributor_list) == 1 & grepl("Netflix", distributor_list)) 1 else 0 
       
       # need to transpose list in order to fit in data frame
       distributor_t <- transpose(distributor_list)
