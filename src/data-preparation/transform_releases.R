@@ -15,7 +15,7 @@ simultaneous <- function(csv_file = "./gen/data-preparation/input/releases.csv")
   releases <- read.csv(csv_file, sep = ";")
   
   # set release data as dates
-  releases$release_data <- as.Date(releases$release_date, "%Y-%m-%d"))
+  releases$release_data <- as.Date(releases$release_date, "%Y-%m-%d")
   
   # create dummy whether whole season is dropped simultaneously
   releases <- releases %>%
