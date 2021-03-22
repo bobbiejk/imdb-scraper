@@ -2,7 +2,7 @@
 require(dplyr)
 require(tidyquant)
 
-popularity <- function(csv_file = "./gen/data-preparation/input/reviews.csv"){
+aggregated <- function(csv_file = "./gen/data-preparation/input/reviews.csv"){
   
   #' Aggregates reviews in weekly data after which count of reviews
   #' and average of rating for that week is obtained.
@@ -47,11 +47,11 @@ popularity <- function(csv_file = "./gen/data-preparation/input/reviews.csv"){
   
   return(reviews_merge)
 }
-popularity_df <- popularity()
+reviews_df <- aggregated()
 
 # create directory
 dir.create("./gen/data-preparation/temp")
 
 # save transformed data
-save(popularity_df, file= "./gen/data-preparation/temp/transform_reviews.RData")
+save(reviews_df, file= "./gen/data-preparation/temp/transform_reviews.RData")
 
