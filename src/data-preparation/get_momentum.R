@@ -38,7 +38,7 @@ momentum <- function(){
 momentum_df <- momentum()
 
 # create directory
-dir.create("./gen/data-preparation/output")
+dir.create("./gen/data-preparation/temp")
 
 # save transformed data
-save(momentum_df, file= "./gen/data-preparation/output/momentum.RData")
+save(momentum_df, file= "./gen/data-preparation/temp/momentum.RData")
