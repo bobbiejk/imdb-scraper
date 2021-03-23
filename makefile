@@ -1,6 +1,6 @@
 all: input transform merge
 input: gen/data-preparation/input/distributors.csv
-transform: gen/data-preparation/temp/transform_distributors.RData gen/data-preparation/temp/transform_producers.RData gen/data-preparation/temp/transform_releases.RData
+transform: gen/data-preparation/temp/transform_distributors.RData gen/data-preparation/temp/transform_producers.RData gen/data-preparation/temp/transform_releases.RData gen/data-preparation/temp/transform_reviews.RData
 merge: gen/data-preparation/output/reviews.RData
 
 # merge data
@@ -10,11 +10,17 @@ gen/data-preparation/output/reviews.RData: src/data-preparation/merge.R
 
 # transform data
 
-gen/data-preparation/temp/transform_distributors.RData gen/data-preparation/temp/transform_producers.RData gen/data-preparation/temp/transform_releases.RData: gen/data-preparation/input/distributors.csv 
-	RScript src/data-preparation/transform_distributors.R
-	RScript src/data-preparation/transform_producers.R
+gen/data-preparation/temp/transform_reviews.RData: gen/data-preparation/input/reviews.csv src/data-preparation/transform_reviews.R
 	RScript src/data-preparation/transform_reviews.R
+
+gen/data-preparation/temp/transform_releases.RData: gen/data-preparation/input/releases.csv src/data-preparation/transform_releases.R
 	RScript src/data-preparation/transform_releases.R
+
+gen/data-preparation/temp/transform_producers.RData: gen/data-preparation/input/producers.csv src/data-preparation/transform_producers.R
+	RScript src/data-preparation/transform_producers.R
+
+gen/data-preparation/temp/transform_distributors.RData: gen/data-preparation/input/distributors.csv src/data-preparation/transform_distributors.R
+	RScript src/data-preparation/transform_distributors.R
 
 # set data to data-preparation/input
 
