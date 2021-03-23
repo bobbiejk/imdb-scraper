@@ -9,9 +9,17 @@ load("./gen/data-preparation/temp/transform_distributors.RData")
 load("./gen/data-preparation/temp/transform_releases.RData")
 
 # load data associated with reviews
-load("./gen/data-preparation/temp/momentum.RData")
+load("./gen/data-preparation/temp/transform_reviews.RData")
 
-reviews_df <- momentum_df
+# change original data set
+originals_df <- originals_df %>%
+  select(id, original) %>%
+  distinct(id)
+
+
+# add original to the data set
+reviews_df <- left_join(reviews_df, originals_df, by="id")
+
 
 # add exclusivity to the data set
 reviews_df$exclusive <- 0
@@ -54,4 +62,4 @@ for (i in 1:nrow(reviews_df)){
 dir.create("./gen/data-preparation/output")
 
 # save merged data
-save(reviews_df,file="./gen/data-preparation/temp/content.RData")
+save(reviews_df,file="./gen/data-preparation/output/reviews.RData")
