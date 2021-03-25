@@ -25,10 +25,10 @@ simultaneous <- function(csv_file = "./gen/data-preparation/input/releases.csv")
   return(releases)
 }
 
-simultaneous_df <- simultaneous()
+releases_df <- simultaneous()
 
 # create directory
 dir.create("./gen/data-preparation/temp")
 
 # save transformed data
-save(simultaneous_df, file= "./gen/data-preparation/temp/transform_releases.RData")
+save(releases_df, file= "./gen/data-preparation/temp/transform_releases.RData")
