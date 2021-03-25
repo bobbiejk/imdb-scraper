@@ -15,7 +15,7 @@ def extract_content_data():
             List of dictionaries consisting of IMDb ID
     ''' 
     # opened csv file
-    with open('../../data/imdb/content.csv') as csv_file:
+    with open('../../data/imdb/content1.csv') as csv_file:
             reader = csv.DictReader(csv_file, delimiter=';')
             content_data = list(reader)
 
@@ -119,6 +119,7 @@ def extract_releases_data(transform_ids):
         else: 
             tv_url =  'tv/'
             tv_id = str(row['tmdb_id'])
+
             url = base_url + tv_url + tv_id + api_key_url
             r = requests.get(url)
             responses = r.json() 
@@ -138,7 +139,12 @@ def extract_releases_data(transform_ids):
                 r = requests.get(url)
                 responses = r.json()
 
-                episodes_data = responses['episodes'] 
+                # if api request is successful, key should be episodes
+                if "episodes" in responses:
+                    episodes_data = responses['episodes'] 
+                # otherwise episodes should not be a key, and request success is false
+                else:
+                    continue
 
                 # for each episode in episodes data, get the episode number and air date
                 for episode_item in episodes_data:
