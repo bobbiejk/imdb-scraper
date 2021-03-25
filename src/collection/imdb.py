@@ -30,7 +30,7 @@ def generate_page_urls(base_url, num_pages):
 
     page_urls = []
 
-    counter_content = 1251
+    counter_content = 1
     for counter in range(1,num_pages+1):
 
         #make sure that is alphabetically sorted, ascending, per 250 items
@@ -45,11 +45,52 @@ def generate_page_urls(base_url, num_pages):
         #make sure that next page shows next 250 content
         counter_content += 250
 
-        sleep(2)
+        #after 10000 has been reached IMDB url's become random
+        if counter_content > 10000:
+            break
+
+        sleep(4)
+
+    #list of random url additions needed to extract all content from 10000 onwards
+    after_10000 = ['&after=WyJQb2vDqW1vbjogTWV3dHdvIFN0cmlrZXMgQmFjayAtIEV2b2x1dGlvbiIsInR0ODg1NjQ3MCIsMTAwMDFd',
+                    '&after=WyJSYWl2b3RhciBPc2EgMiIsInR0NjE1NzM3MCIsMTAyNTFd',
+                    '&after=WyJSaWNoaWUgUmljaCIsInR0NDE2MDkyMCIsMTA1MDFd',
+                    '&after=WyJTYW0gSmF5OiAzIGluIHRoZSBNb3JuaW5nIiwidHQxMjY4OTg3NiIsMTA3NTFd',
+                    '&after=WyJTZXh5IFJvbGxlcmNvYXN0ZXJzIiwidHQ2MjYxMDY0IiwxMTAwMV0%3D',
+                    '&after=WyJTbGFtdG9vbHMiLCJ0dDYxMzM3OTIiLDExMjUxXQ%3D%3D',
+                    '&after=WyJTdGFnIiwidHQ3ODMxMDc0IiwxMTUwMV0%3D',
+                    '&after=WyJTdXBlcnBvdGVyaSIsInR0ODMxNTg4MCIsMTE3NTFd',
+                    '&after=WyJUaGFpIENhdmUgUmVzY3VlIiwidHQ5Mjg2OTkwIiwxMjAwMV0%3D',
+                    '&after=WyJUaGUgQm9vayBvZiBXYXI6IENoYXB0ZXIgVHdvOiBGcmVlZG9tIEFpbid0IEZyZWUiLCJ0dDExNzI1NzE0IiwxMjI1MV0%3D',
+                    '&after=WyJUaGUgRGlyZWN0b3I6IEFuIEV2b2x1dGlvbiBpbiBUaHJlZSBBY3RzIiwidHQyNzY3MjY2IiwxMjUwMV0%3D',
+                    '&after=WyJUaGUgR3JlYXQgR29vZCBQbGFjZSIsInR0OTgyMTE2NiIsMTI3NTFd',
+                    '&after=WyJUaGUgTG9kZ2VyIiwidHQ2NjkwMzc0IiwxMzAwMV0%3D',
+                    '&after=WyJUaGUgUGhhbnRvbSBvZiBDbHViIE1vaXN0IiwidHQ1MTM3ODc2IiwxMzI1MV0%3D',
+                    '&after=WyJUaGUgU3BhZ2hldHRpIFdlc3QiLCJ0dDA5NjI3ODEiLDEzNTAxXQ%3D%3D',
+                    '&after=WyJUaGUgV3JhdGggb2YgTW9ydGljdXMgS2hhbiIsInR0NjIzNjkxNCIsMTM3NTFd',
+                    '&after=WyJUb20sIFNhcmFoIGFuZCBVc2hlciIsInR0MTEyMjk0MyIsMTQwMDFd',
+                    '&after=WyJUdXNpbGFnbyAoc8OtbWIuIHByZW9jdXBhY2nDs24pIiwidHQ4NzM5NjM4IiwxNDI1MV0%3D',
+                    '&after=WyJVcHBpdHk6IFRoZSBXaWxseSBULiBSaWJicyBTdG9yeSIsInR0NTg2MjMzOCIsMTQ1MDFd',
+                    '&after=WyJXZSdyZSBEb25lIiwidHQzODgxMTEyIiwxNDc1MV0%3D',
+                    '&after=WyJXaW5uaW5nIFVnbHkiLCJ0dDIzNzg5NTkiLDE1MDAxXQ%3D%3D',
+                    '&after=WyJaZWl0Z2Vpc3Q6IE1vdmluZyBGb3J3YXJkIiwidHQxNzgxMDY5IiwxNTI1MV0%3D'
+                    ]
+    
+    #iterate over list
+    for item in after_10000:
+        sort_alpha = "&sort=alpha,asc"
+        count = "&count=250"
+        after_url = item
+
+        #assemble new url    
+        full_url = base_url + sort_alpha + after_urlc + count
+        page_urls.append(full_url) 
+
+        sleep(2) 
 
     return page_urls
 
-page_urls = generate_page_urls(distributor_base_urls["Netflix"],5)
+page_urls = generate_page_urls(distributor_base_urls["Netflix"],7)
 print(page_urls)
 
 def extract_content_urls(page_urls):
@@ -179,7 +220,7 @@ def extract_content_data(content_urls):
                         "stars": stars,
                         "genres": genres})
 
-        sleep(1)
+        sleep(3)
 
     return content
 
@@ -277,7 +318,7 @@ def extract_review_data(content_urls):
             soup = BeautifulSoup(request, "html.parser")
 
             # sleep when clicked on button
-            sleep(1)    
+            sleep(2)    
     
         review_container = soup.find_all(class_="lister-item mode-detail imdb-user-review collapsable")
         
@@ -453,7 +494,7 @@ def extract_company_data(content_urls):
                                 "producers":production_companies,
                                 "distributors":distributors})
                                 
-        sleep(2)
+        sleep(3)
        
     return company_credits
 
