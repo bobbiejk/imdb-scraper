@@ -14,12 +14,10 @@ load("./gen/data-preparation/temp/transform_reviews.RData")
 # change original data set
 originals_df <- originals_df %>%
   select(id, original) %>%
-  distinct(id)
-
+  distinct(id, .keep_all = TRUE)
 
 # add original to the data set
 reviews_df <- left_join(reviews_df, originals_df, by="id")
-
 
 # add exclusivity to the data set
 reviews_df$exclusive <- 0
@@ -46,13 +44,13 @@ reviews_df$simultaneous <- 0
 
 for (i in 1:nrow(reviews_df)){
   print(i)
-  for (j in 1:nrow(simultaneous_df)){
+  for (j in 1:nrow(releases_df)){
     
     # check of similar ids in order to check review is written during release period
-    if (reviews_df$id[i] == simultaneous_df$imdb_id[j]){
-      if (reviews_df$review_data[i] >= simultaneous_df$release_data[j] & reviews_df$review_data[i] < simultaneous_df$release_data[j] + 7 & !is.na(reviews_df$review_data[i]) & !is.na(simultaneous_df$release_data[j])){
+    if (reviews_df$id[i] == releases_df$imdb_id[j]){
+      if (reviews_df$review_data[i] >= releases_df$release_data[j] & reviews_df$review_data[i] < releases_df$release_data[j] + 7 & !is.na(reviews_df$review_data[i]) & !is.na(simultaneous_df$release_data[j])){
         reviews_df$releasing[i] <- 1
-        reviews_df$simultaneous[i] <- simultaneous_df$simultaneous[j]
+        reviews_df$simultaneous[i] <- releases_df$simultaneous[j]
       }
     }
   }
