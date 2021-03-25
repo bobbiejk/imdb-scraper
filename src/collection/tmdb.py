@@ -15,8 +15,8 @@ def extract_content_data():
             List of dictionaries consisting of IMDb ID
     ''' 
     # opened csv file
-    with open('../../data/imdb/content1.csv') as csv_file:
-            reader = csv.DictReader(csv_file, delimiter=';')
+    with open('../../data/imdb/content.csv') as csv_file:
+            reader = csv.DictReader(csv_file, delimiter=',')
             content_data = list(reader)
 
     return content_data
