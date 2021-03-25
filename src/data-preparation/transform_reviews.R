@@ -2,10 +2,15 @@
 require(dplyr)
 require(tidyquant)
 
-popularity <- function(){
+aggregated <- function(csv_file = "./gen/data-preparation/input/reviews.csv"){
+  
+  #' Aggregates reviews in weekly data after which count of reviews
+  #' and average of rating for that week is obtained.
+  #' 
+  #' @param csv_file Output of data collection of IMDb reviews
   
   # import reviews csv
-  reviews <- read.csv("./gen/data-preparation/input/reviews.csv", sep=";")
+  reviews <- read.csv(csv_file, sep=",")
   
   # set review date to actual date
   reviews$review_data <- as.Date(reviews$review_data, "%d %B %Y")
@@ -22,7 +27,8 @@ popularity <- function(){
     tq_transmute(select = review_count,
                  mutate_fun = apply.weekly,
                  FUN = sum,
-                 col_rename = "review_count_weekly")
+                 col_rename = "review_count_weekly",
+                 na.rm = TRUE)
   
   # aggregate rating weekly
   reviews_rating_agg <- reviews %>%
@@ -30,7 +36,8 @@ popularity <- function(){
     tq_transmute(select = review_rating_num,
                  mutate_fun = apply.weekly,
                  FUN = mean,
-                 col_rename = "review_rating_weekly")
+                 col_rename = "review_rating_weekly",
+                 na.rm = TRUE)
   
   # merge the weekly count and the weekly rating
   reviews_merge <- merge(reviews_count_agg, reviews_rating_agg)
@@ -40,11 +47,11 @@ popularity <- function(){
   
   return(reviews_merge)
 }
-popularity_df <- popularity()
+reviews_df <- aggregated()
 
 # create directory
 dir.create("./gen/data-preparation/temp")
 
 # save transformed data
-save(popularity_df, file= "./gen/data-preparation/temp/transform_reviews.RData")
+save(reviews_df, file= "./gen/data-preparation/temp/transform_reviews.RData")
 
