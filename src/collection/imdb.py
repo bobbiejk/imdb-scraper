@@ -30,7 +30,7 @@ def generate_page_urls(base_url, num_pages):
 
     page_urls = []
 
-    counter_content = 10001
+    counter_content = 1
     for counter in range(1,num_pages+1):
 
         #make sure that is alphabetically sorted, ascending, per 250 items
@@ -45,11 +45,52 @@ def generate_page_urls(base_url, num_pages):
         #make sure that next page shows next 250 content
         counter_content += 250
 
-        sleep(2)
+        #after 10000 has been reached IMDB url's become random
+        if counter_content > 10000:
+            break
+
+        sleep(4)
+
+    #list of random url additions needed to extract all content from 10000 onwards
+    after_10000 = ['&after=WyJQb2vDqW1vbjogTWV3dHdvIFN0cmlrZXMgQmFjayAtIEV2b2x1dGlvbiIsInR0ODg1NjQ3MCIsMTAwMDFd',
+                    '&after=WyJSYWl2b3RhciBPc2EgMiIsInR0NjE1NzM3MCIsMTAyNTFd',
+                    '&after=WyJSaWNoaWUgUmljaCIsInR0NDE2MDkyMCIsMTA1MDFd',
+                    '&after=WyJTYW0gSmF5OiAzIGluIHRoZSBNb3JuaW5nIiwidHQxMjY4OTg3NiIsMTA3NTFd',
+                    '&after=WyJTZXh5IFJvbGxlcmNvYXN0ZXJzIiwidHQ2MjYxMDY0IiwxMTAwMV0%3D',
+                    '&after=WyJTbGFtdG9vbHMiLCJ0dDYxMzM3OTIiLDExMjUxXQ%3D%3D',
+                    '&after=WyJTdGFnIiwidHQ3ODMxMDc0IiwxMTUwMV0%3D',
+                    '&after=WyJTdXBlcnBvdGVyaSIsInR0ODMxNTg4MCIsMTE3NTFd',
+                    '&after=WyJUaGFpIENhdmUgUmVzY3VlIiwidHQ5Mjg2OTkwIiwxMjAwMV0%3D',
+                    '&after=WyJUaGUgQm9vayBvZiBXYXI6IENoYXB0ZXIgVHdvOiBGcmVlZG9tIEFpbid0IEZyZWUiLCJ0dDExNzI1NzE0IiwxMjI1MV0%3D',
+                    '&after=WyJUaGUgRGlyZWN0b3I6IEFuIEV2b2x1dGlvbiBpbiBUaHJlZSBBY3RzIiwidHQyNzY3MjY2IiwxMjUwMV0%3D',
+                    '&after=WyJUaGUgR3JlYXQgR29vZCBQbGFjZSIsInR0OTgyMTE2NiIsMTI3NTFd',
+                    '&after=WyJUaGUgTG9kZ2VyIiwidHQ2NjkwMzc0IiwxMzAwMV0%3D',
+                    '&after=WyJUaGUgUGhhbnRvbSBvZiBDbHViIE1vaXN0IiwidHQ1MTM3ODc2IiwxMzI1MV0%3D',
+                    '&after=WyJUaGUgU3BhZ2hldHRpIFdlc3QiLCJ0dDA5NjI3ODEiLDEzNTAxXQ%3D%3D',
+                    '&after=WyJUaGUgV3JhdGggb2YgTW9ydGljdXMgS2hhbiIsInR0NjIzNjkxNCIsMTM3NTFd',
+                    '&after=WyJUb20sIFNhcmFoIGFuZCBVc2hlciIsInR0MTEyMjk0MyIsMTQwMDFd',
+                    '&after=WyJUdXNpbGFnbyAoc8OtbWIuIHByZW9jdXBhY2nDs24pIiwidHQ4NzM5NjM4IiwxNDI1MV0%3D',
+                    '&after=WyJVcHBpdHk6IFRoZSBXaWxseSBULiBSaWJicyBTdG9yeSIsInR0NTg2MjMzOCIsMTQ1MDFd',
+                    '&after=WyJXZSdyZSBEb25lIiwidHQzODgxMTEyIiwxNDc1MV0%3D',
+                    '&after=WyJXaW5uaW5nIFVnbHkiLCJ0dDIzNzg5NTkiLDE1MDAxXQ%3D%3D',
+                    '&after=WyJaZWl0Z2Vpc3Q6IE1vdmluZyBGb3J3YXJkIiwidHQxNzgxMDY5IiwxNTI1MV0%3D'
+                    ]
+    
+    #iterate over list
+    for item in after_10000:
+        sort_alpha = "&sort=alpha,asc"
+        count = "&count=250"
+        after_url = item
+
+        #assemble new url    
+        full_url = base_url + sort_alpha + after_urlc + count
+        page_urls.append(full_url) 
+
+        sleep(2) 
 
     return page_urls
 
-page_urls = generate_page_urls(distributor_base_urls["Netflix"],5)
+page_urls = generate_page_urls(distributor_base_urls["Netflix"],7)
 print(page_urls)
 
 def extract_content_urls(page_urls):
@@ -179,7 +220,7 @@ def extract_content_data(content_urls):
                         "stars": stars,
                         "genres": genres})
 
-        sleep(2)
+        sleep(3)
 
     return content
 
@@ -226,6 +267,115 @@ def make_content_csv(content):
     return 
 
 make_content_csv(content)
+
+def extract_review_data(content_urls):
+
+    ''' Collects review date and review rating of all content
+        
+        Args:
+            content_urls: Output of extract_content_urls(page_urls)
+
+        Returns:
+            List of dictionaries consisting of IMDB id, review date,
+            and review rating. Review dates are stored in a list in order
+            to compute the volume of the reviews and aggregate these in a
+            weekly overview to find the rate at which popularity decreases
+    '''
+
+    driver = webdriver.Chrome()
+
+    review_data = []
+
+    for content in content_urls:
+        
+        content_id = content["id"]
+        print(content_id)
+        # reviews that are sorted by submission date
+        reviews_url = content["url"] + "reviews" + "/?sort=submissionDate&dir=desc&rating"
+        
+        driver.get(reviews_url)
+        # sleep when the scraper comes to review page
+        sleep(2)
+
+        request = driver.page_source.encode("utf-8")
+        soup = BeautifulSoup(request, "html.parser")
+
+        # click on all load more buttons
+        while True:
+            # check whether there is a button
+            try:
+                button_data = driver.find_elements_by_class_name("ipl-load-more__button")
+                button = button_data[0]
+            except IndexError:
+                break
+            # check whether there is a clickable button
+            try:
+                button.click()
+            except WebDriverException:
+                break
+            
+            request = driver.page_source.encode("utf-8")
+            soup = BeautifulSoup(request, "html.parser")
+
+            # sleep when clicked on button
+            sleep(2)    
+    
+        review_container = soup.find_all(class_="lister-item mode-detail imdb-user-review collapsable")
+        
+        for review_item in review_container:
+            review_date = review_item.find(class_ = "review-date").get_text()
+            review_rating_data = review_item.find(class_="rating-other-user-rating")
+            if review_rating_data:
+                review_rating = review_rating_data.text.strip()
+            else:
+                review_rating = ""
+            
+            review_data.append({"id": content_id,  
+                                "date": review_date,
+                                "rating": review_rating})
+    return review_data
+
+review_data = extract_review_data(content_urls)
+
+def make_reviews_csv(review_data):
+
+    ''' Creates CSV file of reviews per IMDb id
+    
+        Args:
+            review_data: Output of extract_review_data(content_urls)
+    
+        Returns:
+            CSV file consisting of IMDb id, review data and review rating.
+            Each IMDb id may have several entries depending on the number
+            of reviews that IMDb id has. CSV is stored in ../data/imdb/ 
+            directory
+    ''' 
+    # make sure right directory has been set
+    print(os.getcwd())
+
+    # check whether file location exists
+    dirname = "data/imdb"
+    try:
+        os.makedirs(dirname)
+        print("Directory has been created")
+    except FileExistsError:
+        print("Directory already exists") 
+
+    if os.path.isfile("data/imdb/reviews.csv") == False:
+        with open("data/imdb/reviews.csv", "a", newline='') as csv_file:
+            writer = csv.writer(csv_file, delimiter=";")
+            writer.writerow(["id", "review_data", "review_rating"])
+       
+    with open("data/imdb/reviews.csv", "a", newline='') as csv_file:
+        writer = csv.writer(csv_file, delimiter=";")
+        for review in review_data:
+            print(review)
+            writer.writerow([review['id'], review['date'], review['rating']])
+    print("done!")
+
+    return 
+
+make_reviews_csv(review_data)
 
 def extract_company_data(content_urls):
 
@@ -344,7 +494,7 @@ def extract_company_data(content_urls):
                                 "producers":production_companies,
                                 "distributors":distributors})
                                 
-        sleep(2)
+        sleep(3)
        
     return company_credits
 
@@ -433,110 +583,3 @@ def make_distributor_csv(company_credits):
     return 
 
 make_distributor_csv(company_credits)
-
-def extract_review_data(content_urls):
-
-    ''' Collects review date and review rating of all content
-        
-        Args:
-            content_urls: Output of extract_content_urls(page_urls)
-
-        Returns:
-            List of dictionaries consisting of IMDB id, review date,
-            and review rating. Review dates are stored in a list in order
-            to compute the volume of the reviews and aggregate these in a
-            weekly overview to find the rate at which popularity decreases
-    '''
-
-    driver = webdriver.Chrome()
-
-    review_data = []
-
-    for content in content_urls:
-        
-        content_id = content["id"]
-        print(content_id)
-        # reviews that are sorted by submission date
-        reviews_url = content["url"] + "reviews" + "/?sort=submissionDate&dir=desc&rating"
-        
-        driver.get(reviews_url)
-
-        request = driver.page_source.encode("utf-8")
-        soup = BeautifulSoup(request, "html.parser")
-
-        # click on all load more buttons
-        while True:
-            # check whether there is a button
-            try:
-                button_data = driver.find_elements_by_class_name("ipl-load-more__button")
-                button = button_data[0]
-            except IndexError:
-                break
-            # check whether there is a clickable button
-            try:
-                button.click()
-            except WebDriverException:
-                break
-            
-            request = driver.page_source.encode("utf-8")
-            soup = BeautifulSoup(request, "html.parser")
-
-            # sleep when clicked on button
-            sleep(1)    
-    
-        review_container = soup.find_all(class_="lister-item mode-detail imdb-user-review collapsable")
-        
-        for review_item in review_container:
-            review_date = review_item.find(class_ = "review-date").get_text()
-            review_rating_data = review_item.find(class_="rating-other-user-rating")
-            if review_rating_data:
-                review_rating = review_rating_data.text.strip()
-            else:
-                review_rating = ""
-            
-            review_data.append({"id": content_id,  
-                                "date": review_date,
-                                "rating": review_rating})
-    return review_data
-
-review_data = extract_review_data(content_urls)
-
-def make_reviews_csv(review_data):
-
-    ''' Creates CSV file of reviews per IMDb id
-    
-        Args:
-            review_data: Output of extract_review_data(content_urls)
-    
-        Returns:
-            CSV file consisting of IMDb id, review data and review rating.
-            Each IMDb id may have several entries depending on the number
-            of reviews that IMDb id has. CSV is stored in ../data/imdb/ 
-            directory
-    ''' 
-    # make sure right directory has been set
-    print(os.getcwd())
-
-    # check whether file location exists
-    dirname = "data/imdb"
-    try:
-        os.makedirs(dirname)
-        print("Directory has been created")
-    except FileExistsError:
-        print("Directory already exists") 
-
-    if os.path.isfile("data/imdb/reviews.csv") == False:
-        with open("data/imdb/reviews.csv", "a", newline='') as csv_file:
-            writer = csv.writer(csv_file, delimiter=";")
-            writer.writerow(["id", "review_data", "review_rating"])
-       
-    with open("data/imdb/reviews.csv", "a", newline='') as csv_file:
-        writer = csv.writer(csv_file, delimiter=";")
-        for review in review_data:
-            print(review)
-            writer.writerow([review['id'], review['date'], review['rating']])
-    print("done!")
-
-    return 
-
-make_reviews_csv(review_data)
