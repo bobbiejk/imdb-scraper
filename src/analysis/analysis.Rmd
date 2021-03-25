@@ -9,14 +9,19 @@ knitr::opts_chunk$set(echo = TRUE)
 # needed packages
 require(ggplot2)
 require(dplyr)
+require(ggfortify)
+require(broom)
 
-# data preparation
-
+# loading data for descriptive statistics
+load("./gen/analysis/input/releases.RData")
 load("./gen/analysis/input/content.RData")
-load("./gen/analysis/input/momentum.RData")
-load("./gen/analysis/input/simultaneous.RData")
+
+# loading data for regression
+load("./gen/analysis/input/reviews.RData")
 
 ```
+## Descriptive statistics --
+
 ## Netflix content library
 
 Over the years, it has become increasingly important to gain a competitive advantage by building a unique content library for all streaming services. This can be accomplished by (a) acquiring licensed, but exclusive content or (b) producing original content. The following table exhibits the number of exclusive and original titles over the years. 
@@ -36,10 +41,13 @@ Streaming services often go against the release strategy that is typical for lin
 
 ``` {r}
 
-simultaneous_df %>%
+releases_df %>%
   mutate(year = format(release_data, "%Y")) %>%
-  group_by(year) %>%
+  group_by(imdb_id, year) %>%
+  distinct(year, .keep_all = TRUE) %>%
   na.omit(season_number) %>%
+  ungroup() %>%
+  group_by(year) %>%
   filter(year >= "2005",
          year <= "2021") %>%
   summarise(simultaneous = sum(simultaneous),
@@ -50,14 +58,45 @@ simultaneous_df %>%
 
 ## Reviews
 
-This analysis refers to momentum
+Over the years, more reviews have been written on IMDb. Although over the last couple of years, this growth in reviews has also been subjected to greater variation. This might imply that popularity of particular content may heavily increase number of reviews written in a certain month.
 
-```{r}
+``` {r}
 
-momentum_df %>%
-  ggplot(aes(x=review_data, y= review_count_weekly)) +
-  geom_line()
+reviews_df %>%
+  mutate(months = format(review_data, "%Y-%m")) %>%
+  group_by(months) %>%
+  summarise(reviews_n = sum(review_count_weekly)) %>%
+  ggplot(aes(x = months, y = reviews_n)) +
+          geom_point() +
+  scale_x_discrete(name = "months")
 
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Although the ratings have gone up over the last years, the trend in the average rating is going down and there is also less variation over the months. Currently, content is scoring around a seven on average.
+
+``` {r} 
+
+reviews_df %>%
+  mutate(months = as.Date(format(review_data, "%Y-%m"), "%Y-%m"))
+
+reviews_df %>%
+  mutate(months_format = format(review_data, "%Y-%m")) %>%
+  mutate(months = as.Date(months_format, "%Y-%m")) %>%
+  group_by(months) %>%
+  summarise(reviews_average = mean(review_rating_weekly, na.rm = TRUE)) %>%
+  ggplot(aes(x = months, y = reviews_average)) +
+          geom_point() +
+          scale_x_date(date_labels = "%Y")
+
+```
+
+## Regression -- 
+
+When regressing review count aggregated weekly on exclusivity, release data and whether this release has been simultaneous, it shows that exclusivity has an effect of 4.4 on count of reviews. Hence, exclusive content has a greater ability to attract weekly counts. A week within the release date has an effect of creating 1.5x more reviews. Surprisingly, when a show releases its season all at once, it has an effect of 21 on reviews. This implies that simultaneous release has a huge ability to attract reviewers. 
+
+```{r}
+
+reg <- lm(reviews_df$review_count_weekly ~ reviews_df$exclusive + reviews_df$releasing + reviews_df$simultaneous, data = reviews_df)
+
+summary(reg)  
+```
