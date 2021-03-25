@@ -30,5 +30,5 @@ gen/data-preparation/temp/transform_distributors.RData: gen/data-preparation/inp
 
 # set data to gen/data-preparation/input
 
-gen/data-preparation/input/distributors.csv: data/imdb/distributors.csv
+gen/data-preparation/input/distributors.csv: data/imdb/distributors.csv src/data-preparation/update_input.R
 	RScript src/data-preparation/update_input.R
