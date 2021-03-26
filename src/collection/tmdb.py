@@ -51,6 +51,7 @@ def transform_imdb_in_tmdb(content_data):
 
     # for each row in release dates get imdb id
     for row in transform_ids:
+        print(row)
         try:
             imdb_id = row['imdb_id']
         # needed as it may break when last line of csv is empty row
@@ -107,6 +108,10 @@ def extract_releases_data(transform_ids):
         if row['content_type'] == 'movie':
             movie_url = 'movie/'
             movie_id = str(row['tmdb_id'])
+
+            # print id to show in terminal that code is running
+            print(movie_id)
+
             url = base_url + movie_url + movie_id + api_key_url
             r = requests.get(url)
             responses = r.json() # makes it into a dictionary
@@ -119,6 +124,9 @@ def extract_releases_data(transform_ids):
         else: 
             tv_url =  'tv/'
             tv_id = str(row['tmdb_id'])
+
+            # print id to show in terminal that code is running
+            print(tv_id)
 
             url = base_url + tv_url + tv_id + api_key_url
             r = requests.get(url)
