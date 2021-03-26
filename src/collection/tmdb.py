@@ -71,6 +71,11 @@ def transform_imdb_in_tmdb(content_data):
         elif len(responses['movie_results']) != 0:
             tmdb_id = responses['movie_results'][0]['id'] 
             content_type = 'movie'
+
+        # if no such thing exist, then no tmdb is available
+        else:
+            tmdb_id = ""
+            content_type = ""
         
         # extend every row of transform_id with tmdb id and content type
         row.update({'tmdb_id': tmdb_id,
@@ -116,12 +121,16 @@ def extract_releases_data(transform_ids):
             r = requests.get(url)
             responses = r.json() # makes it into a dictionary
 
-            release_date = responses['release_date']
+            if "release_date" in responses:
+                release_date = responses['release_date']
+            
+            else:
+                release_date = ""
 
             # extend row of transform id with release date
             row.update({'release_date': release_date})
 
-        else: 
+        elif row['content_type'] == 'tv': 
             tv_url =  'tv/'
             tv_id = str(row['tmdb_id'])
 
@@ -130,7 +139,7 @@ def extract_releases_data(transform_ids):
 
             url = base_url + tv_url + tv_id + api_key_url
             r = requests.get(url)
-            responses = r.json() 
+            responses = r.json()
 
             season_number = responses['number_of_seasons']
 
@@ -166,9 +175,13 @@ def extract_releases_data(transform_ids):
             # extend row of transform id with release date
             row.update({'release_date': release_data})
 
+        else:
+            row.update({'release_date': release_data})
+
     return transform_ids
 
 release_dates = extract_releases_data(transform_ids)
+
 
 def make_releases_csv(release_dates):
 
@@ -184,23 +197,24 @@ def make_releases_csv(release_dates):
     ''' 
     dirname = "data/tmdb"
     try:
-        os.makedirs(dirname)
+        os.makedirs(f'../../{dirname}')
         print("Directory has been created")
     except FileExistsError:
         print("Directory already exists") 
 
     # if path does not exists that means that csv file needs to be made
-    if os.path.isfile("data/tmdb/release_dates.csv") == False:
+    if os.path.isfile("../..data/tmdb/release_dates.csv") == False:
             # hence column names need to be specified
             with open("data/tmdb/release_dates.csv", "a", newline='') as csv_file:
                 writer = csv.writer(csv_file, delimiter=";")
                 writer.writerow(["imdb_id", "tmdb_id", 'release_date', 'season_number', 'episode_number'])
 
     # insert values in csv file   
-    with open("data/tmdb/release_dates.csv", "a", newline='') as csv_file:
+    with open("../../data/tmdb/release_dates.csv", "a", newline='') as csv_file:
         writer = csv.writer(csv_file, delimiter=";")
         # for row in release_dates
         for row in release_dates:
+            print(row)
             # if movie
             if row['content_type'] == 'movie':
                 writer.writerow([row['imdb_id'], row['tmdb_id'], row['release_date'], 'NA', 'NA'])
