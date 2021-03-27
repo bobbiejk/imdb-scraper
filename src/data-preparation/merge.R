@@ -48,7 +48,7 @@ for (i in 1:nrow(reviews_df)){
     
     # check of similar ids in order to check review is written during release period
     if (reviews_df$id[i] == releases_df$imdb_id[j]){
-      if (reviews_df$review_data[i] >= releases_df$release_data[j] & reviews_df$review_data[i] < releases_df$release_data[j] + 7 & !is.na(reviews_df$review_data[i]) & !is.na(simultaneous_df$release_data[j])){
+      if (reviews_df$review_data[i] >= releases_df$release_data[j] & reviews_df$review_data[i] < releases_df$release_data[j] + 7 & !is.na(reviews_df$review_data[i]) & !is.na(releases_df$release_data[j])){
         reviews_df$releasing[i] <- 1
         reviews_df$simultaneous[i] <- releases_df$simultaneous[j]
       }
