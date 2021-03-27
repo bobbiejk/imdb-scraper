@@ -203,18 +203,17 @@ def make_releases_csv(release_dates):
         print("Directory already exists") 
 
     # if path does not exists that means that csv file needs to be made
-    if os.path.isfile("../..data/tmdb/release_dates.csv") == False:
+    if os.path.isfile("../../data/tmdb/releases.csv") == False:
             # hence column names need to be specified
-            with open("data/tmdb/release_dates.csv", "a", newline='') as csv_file:
+            with open("../../data/tmdb/releases.csv", "a", newline='') as csv_file:
                 writer = csv.writer(csv_file, delimiter=";")
                 writer.writerow(["imdb_id", "tmdb_id", 'release_date', 'season_number', 'episode_number'])
 
     # insert values in csv file   
-    with open("../../data/tmdb/release_dates.csv", "a", newline='') as csv_file:
+    with open("../../data/tmdb/releases.csv", "a", newline='') as csv_file:
         writer = csv.writer(csv_file, delimiter=";")
         # for row in release_dates
         for row in release_dates:
-            print(row)
             # if movie
             if row['content_type'] == 'movie':
                 writer.writerow([row['imdb_id'], row['tmdb_id'], row['release_date'], 'NA', 'NA'])
