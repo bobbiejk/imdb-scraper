@@ -9,6 +9,11 @@ input2: gen/analysis/input/reviews.RData
 gen/analysis/input/reviews.RData: src/analysis/update_input.R
 	RScript src/analysis/update_input.R
 
+# descriptive analysis after data preparation
+
+gen/data-preparation/output/descriptives.html: src/data-preparation/descriptives.Rmd 
+	R -e "rmarkdown::render('src/data-preparation/descriptives.Rmd', output_file = 'gen/data-preparation/output/descriptives.html')"
+
 # merge data
 
 gen/data-preparation/output/reviews.RData: src/data-preparation/merge.R
