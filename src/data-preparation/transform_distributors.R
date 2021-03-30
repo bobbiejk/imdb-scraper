@@ -18,6 +18,9 @@ exclusivity <- function(csv_file = "./gen/data-preparation/input/distributors.cs
   distributors <- distributors %>%
     na.omit()
   
+  # clean data from faulty observation
+  distributors <- distributors[!(distributors$id == "tt4908644" & distributors$distributor_country == "Chile "),]
+  
   # get unique_ids from dataset
   unique_ids = c()
   for (id in distributors$id){
