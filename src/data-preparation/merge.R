@@ -38,18 +38,28 @@ for (i in 1:nrow(reviews_df)){
   }
 }
 
+# remove those titles that are in production
+reviews_df <- reviews_df[!(reviews_df$exclusive == 0 & reviews_df$original == 1),]
+
 # add releasing and simultaneous dummy to the data set
 reviews_df$releasing <- 0
 reviews_df$simultaneous <- 0
+reviews_df$duration <- 0
 
 for (i in 1:nrow(reviews_df)){
   print(i)
   for (j in 1:nrow(releases_df)){
     
-    # check of similar ids in order to check review is written during release period
+    # check if similar ids
     if (reviews_df$id[i] == releases_df$imdb_id[j]){
+      # count the difference between release date and review written
+      duration <- reviews_df$review_data[i] - releases_df$release_data
+      reviews_df$duration[i] <- duration
+      
+      # check whether review has been written in same week
       if (reviews_df$review_data[i] >= releases_df$release_data[j] & reviews_df$review_data[i] < releases_df$release_data[j] + 7 & !is.na(reviews_df$review_data[i]) & !is.na(releases_df$release_data[j])){
         reviews_df$releasing[i] <- 1
+        #transfer value simultaneous from releases to reviews
         reviews_df$simultaneous[i] <- releases_df$simultaneous[j]
       }
     }
