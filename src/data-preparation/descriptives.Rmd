@@ -1,0 +1,122 @@
+---
+title: "Descriptives after data preparation"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# needed packages
+require(ggplot2)
+require(dplyr)
+
+# loading data for descriptive statistics
+load("./gen/data-preparation/temp/transform_distributors.RData")
+load("./gen/data-preparation/temp/transform_producers.RData")
+load("./gen/data-preparation/temp/transform_reviews.RData")
+load("./gen/data-preparation/temp/transform_releases.RData")
+
+```
+
+# Descriptive statistics
+
+## Netflix content library
+
+First, the content library over the years is measured including only those observations that have "Netflix" in their list of distributors for that particular year. The results are summarized in the table below. As you can see, the IMDb data has an under representation of the actual content library, especially in the earlier years.
+
+```{r}
+# merge orginals to exclusives to depict over distributor years which content is exclusive.
+content_df <- exclusive_df %>%
+  left_join(originals_df, by="id")
+
+# get rid of titles that are in production
+content_df <- content_df[!(content_df$exclusive == 0 & content_df$original == 1),]
+
+# number of content over the years
+content_df %>%
+  group_by(year) %>%
+  filter(year >= 2007,
+         year <= 2021) %>%
+  summarise(n = sum(ifelse(grep("Netflix", distributors), 1 , 0)))
+
+```
+
+Over the years, it has become increasingly important to gain a competitive advantage by building a unique content library for all streaming services. This can be accomplished by (a) acquiring licensed, but exclusive content or (b) producing original content. The following table exhibits the number of exclusive and original titles over the years. Intuitively, the ratio of exclusive content is higher than the ratio of orginal content since all original shows are exclusives, yet acquired content may also be exclusive.
+
+```{r}
+# merge orginals to exclusives to depict over distributor years which content is exclusive.
+content_df <- exclusive_df %>%
+  left_join(originals_df, by="id")
+
+# get rid of titles that are in production
+content_df <- content_df[!(content_df$exclusive == 0 & content_df$original == 1),]
+
+content_df %>%
+  group_by(year) %>%
+  filter(year >= 2007,
+         year <= 2021) %>%
+  summarise(n = sum(ifelse(grep("Netflix", distributors), 1 , 0)),
+            exclusive = sum(exclusive),
+            ratio_exclusive = exclusive / n,
+            original = sum(original, na.rm = TRUE),
+            ratio_original = original /n)
+
+```
+## Releasing strategy
+
+Streaming services often go against the release strategy that is typical for linear television. That is, often on streaming services, all episodes of one show for an entire season is dropped simultaneously. In order to demonstrate this phenomena, the following table showcasts how the strategy of simultaneously dropping an entire season has been popularized over the years. 
+
+``` {r}
+
+releases_df %>%
+  mutate(year = format(release_data, "%Y")) %>%
+  group_by(imdb_id, year) %>%
+  distinct(year, .keep_all = TRUE) %>%
+  na.omit(season_number) %>%
+  ungroup() %>%
+  group_by(year) %>%
+  filter(year >= "2005",
+         year <= "2021") %>%
+  summarise(simultaneous = sum(simultaneous),
+            n = n()) %>%
+  mutate(ratio = simultaneous / n)
+
+```
+
+## Reviews
+
+Over the years, more reviews have been written on IMDb. Although over the last couple of years, this growth in reviews has also been subjected to greater variation. This might imply that popularity of particular content may heavily increase number of reviews written in a certain month.
+
+``` {r}
+# function to ensure that every nth tick is visible on x-axis
+every_nth = function(n) {
+  return(function(x) {x[c(TRUE, rep(FALSE, n - 1))]})
+}
+
+reviews_df %>%
+  mutate(months = format(review_data, "%Y-%m")) %>%
+  group_by(months) %>%
+  summarise(reviews_n = sum(review_count_weekly)) %>%
+  ggplot(aes(x = months, y = reviews_n)) +
+          geom_point() +
+  scale_x_discrete(breaks = every_nth(n=24)) +
+  labs(title = "Number of reviews across time",
+       x = "Months",
+       y = "Sum of number of reviews")
+
+```
+
+Although the ratings have gone up over the last years, the trend in the average rating is going down and there is also less variation over the months. Currently, content is scoring around a seven on average.
+
+``` {r} 
+reviews_df %>%
+  mutate(months = format(review_data, "%Y-%m")) %>%
+  group_by(months) %>%
+  summarise(reviews_mean = mean(review_rating_weekly, na.rm = TRUE)) %>%
+  ggplot(aes(x = months, y = reviews_mean)) +
+          geom_point() +
+  scale_x_discrete(breaks = every_nth(24)) +
+  labs(title = "Average review rating across time",
+       x = "Months",
+       y = "Average rating")
+```
