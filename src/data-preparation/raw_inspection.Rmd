@@ -1,0 +1,252 @@
+---
+title: "Raw Data inspectation"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+## load sets
+
+distributors_df <- read.csv("./gen/data-preparation/input/distributors.csv", sep = ",")
+
+producers_df <- read.csv("./gen/data-preparation/input/producers.csv", sep = ",")
+
+content_df <- read.csv("./gen/data-preparation/input/content.csv", sep = ",")
+
+reviews_df <- read.csv("./gen/data-preparation/input/reviews.csv", sep = ",")
+
+releases_df<- read.csv("./gen/data-preparation/input/releases.csv", sep = ";")
+
+##needed packages
+library(dplyr)
+```
+
+## Explaining the variables
+There are 38.246 unique id's which all have a distributor name, type and country.
+## by mean of country and others
+
+```{r distributors}
+summary(distributors_df)
+```
+## By most country
+```{r }
+distributors_df%>%
+  group_by(distributor_country)%>%
+  summarise(n=n())%>%
+  arrange(desc(n))
+```
+# by type
+```{r distributors}
+distributors_df%>%
+  group_by(distributor_type)%>%
+  summarise(n=n())%>%
+  arrange(desc(n))
+```
+#by name
+```{r distributors}
+distributors_df%>%
+  group_by(distributor_name)%>%
+  summarise(n=n())%>%
+  arrange(desc(n))
+```
+#beginning and end year netflix
+```{r distributors}
+
+distributors_df%>%
+  filter(distributor_name== 'Netflix')%>%
+  summarise(min=min(distributor_start_year, na.rm= TRUE), 
+            max=max(distributor_end_year, na.rm= TRUE))
+
+distributor_with_deletion<-distributors_df%>%
+  filter(!(distributor_name== 'Netflix'& distributor_start_year< 1997))
+
+distributor_with_deletion%>%
+  filter(distributor_name== 'Netflix')%>%
+  summarise(min=min(distributor_start_year, na.rm= TRUE), 
+            max=max(distributor_end_year, na.rm= TRUE))
+
+```
+
+# Producers summary
+```{r}
+```
+
+## explaining the variables
+```{r producers}
+summary(producers_total)
+```
+
+# by producer 
+```{r}
+producers_df%>%
+  filter(grepl('Netflix', producer))%>%
+  summarise(n=n())
+
+```
+
+## explaning the variables
+```{r content}
+summary(content_total)
+```
+##By most country
+```{r content}
+content_df%>%
+  group_by(country)%>%
+  summarise(n=n())%>%
+  arrange(desc(n))
+```
+## by most genre
+```{r content}
+content_df%>%
+  group_by(genres)%>%
+  summarise(n=n())%>%
+  arrange(desc(n))
+```
+## by most stars
+```{r content}
+content_df%>%
+  filter(!(stars== "[]"))%>% 
+  group_by(stars)%>%
+  summarise(n=n())%>%
+  arrange(desc(n))
+```
+#reviews summary
+```{r}
+```
+
+# explaning the variables
+```{r reviews}
+summary(reviews_total)
+```
+
+```{r reviews_df}
+# get na
+sum(reviews_df$review_rating== "")
+
+sum(reviews_df$data== "")
+  
+```
+
+```{r reviews_df}
+
+reviews_df%>%
+  group_by(id)%>%
+  summarise(n=n())%>%
+  arrange(desc(n))
+  
+```
+
+```{r reviews_df}
+
+reviews_df%>%
+  group_by(id)%>%
+  summarise(n=n())%>%
+  summarise(median= median(n),
+            mean= mean(n),
+            sd= sd(n))
+  
+
+
+  
+```
+
+```{r reviews_df}
+  
+# get first number in rating
+reviews_df$review_rating_num <- as.numeric(gsub("/.*", "", reviews_df$review_rating))
+
+reviews_df%>%
+  summarise(mean= mean(review_rating_num, na.rm= TRUE))
+```
+
+
+#min max review date
+```{r reviews_df}
+
+# set review date to actual date
+reviews_df$review_data <- as.Date(reviews_df$review_data, "%d %B %Y")  
+
+reviews_df%>%
+  summarise(min=min(review_data, na.rm= TRUE), 
+            max=max(review_data, na.rm= TRUE))
+
+```
+
+#releases
+```{r reviews}
+summary(releases_df)
+```
+#min,max seizoenen 
+```{r reviews}
+
+releases_df%>%
+  summarise(min=min(season_number, na.rm= TRUE), 
+            max=max(season_number, na.rm= TRUE),
+            median= median(season_number,na.rm = TRUE),
+            mean= mean(season_number, na.rm = TRUE),
+            sd= sd(season_number, na.rm = TRUE))
+```
+#min,max episodes
+```{r reviews}
+
+releases_df%>%
+  summarise(min=min(episode_number, na.rm= TRUE), 
+            max=max(episode_number, na.rm= TRUE),
+            median= median(episode_number,na.rm = TRUE),
+            mean= mean(episode_number, na.rm = TRUE),
+            sd= sd(episode_number, na.rm = TRUE))
+```
+
+```{r releases}
+releases_df$release_date <- as.Date(releases_df$release_date, "%Y-%m-%d")
+
+releases_df$weekdays<- c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", 
+    "Friday", "Saturday")[as.POSIXlt(releases_df$release_date)$wday + 1]
+
+releases_df%>%
+  group_by(weekdays)%>%
+  summarise(n=n())%>%
+  arrange(desc(n))
+
+```
+
+#
+
+#missing data
+```{r}
+# content 
+sum(content_df$title == "")
+sum(content_df$duration == "")
+sum(content_df$country == "")
+sum(content_df$stars == "[]")
+sum(content_df$genres == "[]")
+```
+
+```{r}
+# distributors
+sum(distributors_df$distributor_name == "")
+sum(distributors_df$distributor_country == "")
+sum(distributors_df$distributor_type == "")
+sum(is.na(distributors_df$distributor_start_year))
+sum(is.na(distributors_df$distributor_end_year))
+```
+
+```{r}
+# producers
+sum(producers_df$producer == "[]")
+```
+
+```{r}
+# reviews
+sum(reviews_df$review_data == "")
+sum(reviews_df$review_rating== "")
+
+```
+
+```{r}
+# releases
+sum(releases_df$release_date == "")
+sum(is.na(releases_df$season_number))
+sum(is.na(releases_df$episode_number))
+```
