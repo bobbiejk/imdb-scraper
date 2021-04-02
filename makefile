@@ -45,3 +45,8 @@ gen/data-preparation/temp/transform_distributors.RData: gen/data-preparation/inp
 
 gen/data-preparation/input/distributors.csv: data/imdb/distributors.csv src/data-preparation/update_input.R
 	RScript src/data-preparation/update_input.R
+
+# download data
+
+data/imdb/distributors.csv: src/data-preparation/download_files.R
+	RScript src/data-preparation/download_files.R
