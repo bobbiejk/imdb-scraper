@@ -11,10 +11,10 @@ require(ggplot2)
 require(dplyr)
 
 # loading data for descriptive statistics
-load("./gen/data-preparation/temp/transform_distributors.RData")
-load("./gen/data-preparation/temp/transform_producers.RData")
-load("./gen/data-preparation/temp/transform_reviews.RData")
-load("./gen/data-preparation/temp/transform_releases.RData")
+load("../../gen/data-preparation/temp/transform_distributors.RData")
+load("../../gen/data-preparation/temp/transform_producers.RData")
+load("../../gen/data-preparation/temp/transform_reviews.RData")
+load("../../gen/data-preparation/temp/transform_releases.RData")
 
 ```
 
