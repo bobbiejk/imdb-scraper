@@ -6,52 +6,61 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-## load sets
-
+## loading data for raw data inspection
 distributors_df <- read.csv("./gen/data-preparation/input/distributors.csv", sep = ",")
-
 producers_df <- read.csv("./gen/data-preparation/input/producers.csv", sep = ",")
-
 content_df <- read.csv("./gen/data-preparation/input/content.csv", sep = ",")
-
 reviews_df <- read.csv("./gen/data-preparation/input/reviews.csv", sep = ",")
-
 releases_df<- read.csv("./gen/data-preparation/input/releases.csv", sep = ";")
 
 ##needed packages
 library(dplyr)
 ```
 
-## Explaining the variables
-There are 38.246 unique id's which all have a distributor name, type and country.
-## by mean of country and others
+#Raw data inspection
 
-```{r distributors}
+#Distributors
+## Explaining the variables
+For every unique imdb id there can be found a unique distributor name, type and country. An imdb id can have multiple names, types and country's connected to it. We also see the start year and end year of the distributor, where there is a minimum and maximum. The average start year is 2013 and end year is 2014. There are 403 missing cases here.
+
+```{r}
 summary(distributors_df)
 ```
 ## By most country
+
+We see that the country where most shows/movies get produced is the USA with follow up of the Netherlands. Worldwide is also high up and means that it is distributed by more than 1 country.
+
 ```{r }
 distributors_df%>%
   group_by(distributor_country)%>%
   summarise(n=n())%>%
   arrange(desc(n))
 ```
-# by type
-```{r distributors}
+## by type 
+
+We see that theatrical is the most distributed by type with following of tv and video. One unique imdb id can have more than one distributor type, so it is possible they have a theatrical distribution and later is also distributed on multiple other platforms.
+
+```{r}
 distributors_df%>%
   group_by(distributor_type)%>%
   summarise(n=n())%>%
   arrange(desc(n))
 ```
 #by name
-```{r distributors}
+
+We see there is strong variation in the company who distributed the tv-show or movie with Netflix clearly on top with the most distribution.
+
+```{r}
 distributors_df%>%
   group_by(distributor_name)%>%
   summarise(n=n())%>%
   arrange(desc(n))
 ```
 #beginning and end year netflix
-```{r distributors}
+
+A follow up on the data above we see that the first Netflix distribution was in 1997 and already in progress for the latest distribution title in 2023.
+
+```{r}
 
 distributors_df%>%
   filter(distributor_name== 'Netflix')%>%
@@ -68,11 +77,11 @@ distributor_with_deletion%>%
 
 ```
 
-# Producers summary
-```{r}
-```
+# Producers
+## Explaining the variables
 
-## explaining the variables
+We have 5649 unique imdb id's which all can have multiple producers.
+
 ```{r producers}
 summary(producers_total)
 ```
@@ -82,53 +91,71 @@ summary(producers_total)
 producers_df%>%
   filter(grepl('Netflix', producer))%>%
   summarise(n=n())
-
 ```
 
+# Content
 ## explaning the variables
-```{r content}
+
+The content set consists of 4855 unique imdb id's which all have a title, duration, country and can have multiple stars and genres connected to them.
+
+```{r}
 summary(content_total)
 ```
 ##By most country
-```{r content}
+
+Here we see the country's where the most content is available.
+
+```{r}
 content_df%>%
   group_by(country)%>%
   summarise(n=n())%>%
   arrange(desc(n))
 ```
-## by most genre
-```{r content}
+## by genre
+
+The highest value in content by genre is comedy followed by documentary and drama.
+
+```{r}
 content_df%>%
   group_by(genres)%>%
   summarise(n=n())%>%
   arrange(desc(n))
 ```
 ## by most stars
-```{r content}
+
+Here we see the stars that play in the movie/tv shows ranked from high to low.
+
+```{r}
 content_df%>%
   filter(!(stars== "[]"))%>% 
   group_by(stars)%>%
   summarise(n=n())%>%
   arrange(desc(n))
 ```
-#reviews summary
-```{r}
-```
+# Reviews
+## explaning the variables
 
-# explaning the variables
-```{r reviews}
+In total there are 429.977 reviews that were collected. One unique imdb id can have multiple review ratings.
+
+```{r}
 summary(reviews_total)
 ```
+##Missing values
 
-```{r reviews_df}
+Here we see that for every review writen there are no missing values for the date of writing and 17.519 missing values on the review rating given. So sometimes it is possible no rating was giving by people when writing the review.
+
+```{r}
 # get na
 sum(reviews_df$review_rating== "")
 
 sum(reviews_df$data== "")
   
 ```
+## by imdb id 
 
-```{r reviews_df}
+Here we see for which imdb id the most reviews were writen, which can indicate the popularity of a show or movie.
+
+```{r}
 
 reviews_df%>%
   group_by(id)%>%
@@ -136,8 +163,11 @@ reviews_df%>%
   arrange(desc(n))
   
 ```
+## by imdb id
 
-```{r reviews_df}
+The average reviews written for a show or movie is 98. We do see that the middle value of reviews written is 19 so there is a big spread in whether one show/movie has a lot of reviews and the other one has not. In later research this could point to how popular a show/movie is.
+
+```{r}
 
 reviews_df%>%
   group_by(id)%>%
@@ -150,8 +180,11 @@ reviews_df%>%
 
   
 ```
+## by rating
 
-```{r reviews_df}
+The average rating of a show/movie is a 6.8.
+
+```{r}
   
 # get first number in rating
 reviews_df$review_rating_num <- as.numeric(gsub("/.*", "", reviews_df$review_rating))
@@ -160,9 +193,11 @@ reviews_df%>%
   summarise(mean= mean(review_rating_num, na.rm= TRUE))
 ```
 
+## Review Date
 
-#min max review date
-```{r reviews_df}
+The first date where a review was written was in 1998 where the latest review written was on 2020-12-31 , so this was the latest point in collecting the review data.
+
+```{r}
 
 # set review date to actual date
 reviews_df$review_data <- as.Date(reviews_df$review_data, "%d %B %Y")  
@@ -173,12 +208,18 @@ reviews_df%>%
 
 ```
 
-#releases
-```{r reviews}
+# Releases
+## Explaining the variables
+
+In the releases dataset for every unique imdb id we can find a tmdb id which contain the information about the release date of the show/movie the season numbers and episode numbers. Every id is split up in seasons en contains for that season a certain number of episodes.
+
+```{r}
 summary(releases_df)
 ```
-#min,max seizoenen 
-```{r reviews}
+## Number of seasons
+
+The minimum amount of seasons is 1 where the maximum is 48, so this is probably an outlier. This because the average amount of seasons is 3.7 and the exact middle of the data is 2 seasons. The standard deviation tells us about the spread which is almost 5 so there is a big spread in the number of seasons per show.
+```{r}
 
 releases_df%>%
   summarise(min=min(season_number, na.rm= TRUE), 
@@ -187,8 +228,11 @@ releases_df%>%
             mean= mean(season_number, na.rm = TRUE),
             sd= sd(season_number, na.rm = TRUE))
 ```
-#min,max episodes
-```{r reviews}
+## Number of episodes
+
+Here we see the minimum number of episodes per id and the maximum number of episodes. The average number of episodes for a tv show is 40 while the middle of the data set contains 9 number of episodes. This means that there is a spread which we can see in the standard deviation which is 174.
+
+```{r}
 
 releases_df%>%
   summarise(min=min(episode_number, na.rm= TRUE), 
@@ -197,8 +241,11 @@ releases_df%>%
             mean= mean(episode_number, na.rm = TRUE),
             sd= sd(episode_number, na.rm = TRUE))
 ```
+## Weekday Release
 
-```{r releases}
+The most shows were released on a friday with the following of thursday. These are the most populair days when a show is released to the public.
+
+```{r}
 releases_df$release_date <- as.Date(releases_df$release_date, "%Y-%m-%d")
 
 releases_df$weekdays<- c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", 
@@ -211,9 +258,14 @@ releases_df%>%
 
 ```
 
-#
+
 
 #missing data
+
+## missing content data
+
+In the content dataset we have no missing values for the title of a tv-show?movie. We do have missing values for the following: 852 missing for the duration of a show/movie, 3 country's missing in the set, 135 stars and 15 genres not found.
+
 ```{r}
 # content 
 sum(content_df$title == "")
@@ -222,6 +274,9 @@ sum(content_df$country == "")
 sum(content_df$stars == "[]")
 sum(content_df$genres == "[]")
 ```
+## Missing content distributors
+
+In the distributors set we have no missing data in the distributor name, country and type. We do have missing values in the distributor start and end year which are respectively 403 each.
 
 ```{r}
 # distributors
@@ -231,11 +286,17 @@ sum(distributors_df$distributor_type == "")
 sum(is.na(distributors_df$distributor_start_year))
 sum(is.na(distributors_df$distributor_end_year))
 ```
+## Missing data producers
+
+In the producers set we have 664 missing values which indicate that for 664 id's the producers is missing.
 
 ```{r}
 # producers
 sum(producers_df$producer == "[]")
 ```
+## Missing data reviews
+
+In the review dataset we miss in total 17.519 unique review ratings.
 
 ```{r}
 # reviews
@@ -243,6 +304,9 @@ sum(reviews_df$review_data == "")
 sum(reviews_df$review_rating== "")
 
 ```
+## Missing data releases
+
+In the releases dataset for every release of a show there are 2566 missing values for the season and episode number.
 
 ```{r}
 # releases
