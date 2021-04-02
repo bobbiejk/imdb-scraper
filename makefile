@@ -1,5 +1,7 @@
-all: input transform merge descriptives input2 analysis
+all: input inspection transform merge descriptives input2 analysis
+
 input: gen/data-preparation/input/distributors.csv
+inspection: gen/data-preparation/output/raw_inspection.html
 transform: gen/data-preparation/temp/transform_distributors.RData gen/data-preparation/temp/transform_producers.RData gen/data-preparation/temp/transform_releases.RData gen/data-preparation/temp/transform_reviews.RData
 merge: gen/data-preparation/output/reviews.RData
 descriptives: gen/data-preparation/output/descriptives.html
@@ -40,6 +42,11 @@ gen/data-preparation/temp/transform_producers.RData: gen/data-preparation/input/
 
 gen/data-preparation/temp/transform_distributors.RData: gen/data-preparation/input/distributors.csv src/data-preparation/transform_distributors.R
 	RScript src/data-preparation/transform_distributors.R
+
+# raw data inspection
+
+gen/data-preparation/output/raw_inspection.html: src/data-preparation/raw_inspection.Rmd 
+	R -e "rmarkdown::render('src/data-preparation/raw_inspection.Rmd', output_file = 'gen/data-preparation/output/raw_inspection.html')"
 
 # set data to gen/data-preparation/input
 
