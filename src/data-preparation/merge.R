@@ -48,19 +48,24 @@ reviews_df$duration <- 0
 
 for (i in 1:nrow(reviews_df)){
   print(i)
-  for (j in 1:nrow(releases_df)){
+  
+  # check if id in reviews df exists in releases df
+  if (reviews_df$id[i] %in% releases_df$imdb_id){
     
-    # check if similar ids
-    if (reviews_df$id[i] == releases_df$imdb_id[j]){
-      # count the difference between release date and review written
-      duration <- reviews_df$review_data[i] - releases_df$release_data
-      reviews_df$duration[i] <- duration
-      
-      # check whether review has been written in same week
-      if (reviews_df$review_data[i] >= releases_df$release_data[j] & reviews_df$review_data[i] < releases_df$release_data[j] + 7 & !is.na(reviews_df$review_data[i]) & !is.na(releases_df$release_data[j])){
-        reviews_df$releasing[i] <- 1
-        #transfer value simultaneous from releases to reviews
-        reviews_df$simultaneous[i] <- releases_df$simultaneous[j]
+    for (j in 1:nrow(releases_df)){
+    
+      # check if similar ids
+      if (reviews_df$id[i] == releases_df$imdb_id[j]){
+        # count the difference between release date and review written
+        duration <- reviews_df$review_data[i] - releases_df$release_data[j]
+        reviews_df$duration[i] <- duration
+        
+        # check whether review has been written in same week
+        if (reviews_df$review_data[i] >= releases_df$release_data[j] & reviews_df$review_data[i] < releases_df$release_data[j] + 7 & !is.na(reviews_df$review_data[i]) & !is.na(releases_df$release_data[j])){
+          reviews_df$releasing[i] <- 1
+          #transfer value simultaneous from releases to reviews
+          reviews_df$simultaneous[i] <- releases_df$simultaneous[j]
+        }
       }
     }
   }
