@@ -1,5 +1,5 @@
 ---
-title: "Analysis of the popularity of Netflix content"
+title: "Analysis of the drivers of popular Netflix content"
 output: html_document
 ---
 
@@ -14,18 +14,23 @@ dir.create("../../gen/analysis/output")
 require(ggplot2)
 require(dplyr)
 require(ggfortify)
-require(broom)
+require(stargazer)
+require(corrplot)
 
 # loading data for regression
 load("../../gen/analysis/input/reviews.RData")
 
 ```
 
-# Regression  
+# Regression analysis
 
 ## Number of reviews
 
-When regressing review count aggregated weekly on exclusivity, originals, whether the show was releasing at the time of review writing, whether this release has been simultaneous and the time between release date and review writing, it shows that exclusive, original and simultaneous release shows have a positive effect on number of reviews. Moreover, this effect is the highest for original shows. Regarding the time between review writing and release dates captured by duration and its quadratic term, it is found that there is a convex relationship. Hence, this implies that 
+### Full model
+
+When regressing review count aggregated weekly on exclusivity, originals, whether the show was releasing at the time of review writing, whether this release has been simultaneous and the time between release date and review writing, it shows that exclusive, original and simultaneous release shows have a positive effect on number of reviews. Moreover, this effect is the highest for original shows. Regarding the time between review writing and release dates captured by duration and its quadratic term, it is found that there is a convex relationship. Hence, this implies that when there is less time in between the release dates and the review date, an additional day has a negative effect on number of reviews. Yet, at some point, this effect becomes positive. Although this may be counter-intuitive, an explanation for this may be that large discrepancies between release dates and review dates may only be measured for highly popular shows e.g. Friends still has 23 reviews written in March 2021 although its latest release date has been in 2004. It is found that reviews written within a week of the release date does not have a significant impact on the number of reviews written. 
+
+*Note. As seen in the descriptive analysis, the number of reviews increased over time. We have accounted for this in the model using trend and its quadratic term. The outcome implies that the number of reviews with respect to the trend is increasing as time increases.*
 
 ```{r}
 
@@ -35,14 +40,61 @@ reviews_df$trend <- as.numeric(reviews_df$review_data)
 reviews_df$quad_trend <- reviews_df$trend * reviews_df$trend
 
 # regression analysis
-reg <- lm(reviews_df$review_count_weekly ~ reviews_df$exclusive + reviews_df$original + reviews_df$releasing + reviews_df$simultaneous + reviews_df$duration + reviews_df$quad_dur + reviews_df$trend + reviews_df$quad_trend, data = reviews_df)
+reg_1 <- lm(reviews_df$review_count_weekly ~ reviews_df$exclusive + reviews_df$original + reviews_df$releasing + reviews_df$simultaneous + reviews_df$duration + reviews_df$quad_dur + reviews_df$trend + reviews_df$quad_trend, data = reviews_df)
 
-summary(reg)  
+summary(reg_1)  
 ```
 
-In order to use OLS for estimation, the model should satisfy the following assumptions: (i) homoskedasticity, (ii) mean independence, (iii) normal distribution of the error term
+### Model assumptions
+
+In order to use OLS, the following assumptions need to be satisfied: (i) linear in the parameters, (ii) random sampling, (iii) no perfect collinearity, (iv) zero conditional mean and (v) normal distribution of the error terms and (vi) homoskedasticity. The first assumption is satisfied by the model specification. The second assumption is satisfied as explained in the datasheet, that is, we have the full sample of content on Netflix as stated of which Netflix has been a distributor according to IMDb. 
+
+Regarding the third assumption, the table below depicts the correlation matrix, which shows that none of the correlation exceeds the 0.80 treshold of multicollinearity, except for the quadratic terms, which is intuitive considering that it is just a transformation of the same variable. 
+
+``` {r include=FALSE}
+# delete the id and review_date row
+reviews_corr <- reviews_df[ , -c(1:2)]
+
+# create the correlation matrix
+cor(reviews_corr, use= "complete.obs" )
+```
+The fourth, fifth and sixth assumption are tested by checking plots of the residual. Although the blue line in the first plot seems to be horizontal, an assessment cannot be made considering that there are outliers that should be removed in order to make a more informed assessment (see note.) Hence, due to the massive outliers seen in plot 1, we assume that there is a violation the zero conditional mean assumption which states that conditional on the explanatory variables, the error term should have an expectation of zero. The fifth assumption of normality is also violated, considering that that the plotted standardized residuals are off the diagonal. Also, the homoskedasticity assumption is violated as the blue line is rather diagonal than a steep line, this implies that the error terms vary across observations. 
+
+*Note. Although, we have tried to remove outliers, the model has been calculated using a different number of observations than that which were in the data. Deletion of all NA entries did not suffice to have the same amount of observations. This is crucial in order to compute all outliers per observation and subsequentially remove all outliers above a certain treshold.*
 ``` {r}
-
-autoplot(reg)
-
+autoplot(reg_1,
+         which = 1:3,
+         nrow = 1,
+         ncol = 3)
 ```
+
+
+## Review rating
+
+### Full model
+
+Regressing the review rating on the same variables shows that original has a positive effect on the review rating, whereas exclusive and simultaneous released content has a negative impact on the review rating. Since exclusive rights may be expensive, likeability of shows should be assessed in order to provide consumers with valuable content. Contrarily to the regression on number of reviews, it is found that duration between release date and review date has a positive effect on review rating, although at some point in time this relationship becomes negative. An explanation of this finding may be the shift in cultural norms over time. 
+
+*Note. As seen in the descriptive analysis, the review rating decreased over time with the lowest point in 2018. After this the review rating increased a little. We have accounted for this in the model using trend and its quadratic term. The outcome implies that the review rating has convex relationship.*
+
+```{r}
+
+# regression analysis
+reg_2 <- lm(reviews_df$review_rating_weekly ~ reviews_df$exclusive + reviews_df$original + reviews_df$releasing + reviews_df$simultaneous + reviews_df$duration + reviews_df$quad_dur + reviews_df$trend + reviews_df$quad_trend, data = reviews_df)
+
+summary(reg_2)  
+```
+
+### Model assumptions
+
+Again, the model has been specified so that the parameters are linear and the data has been collected using all available data on IMDb which has specified Netflix as a distributor. The same multicollinearity matrix hold that has been estimated in the first regression considering that the same dataset has been used. The following plots reveal whether the zero conditional mean assumption, normality assumption and homoskedasticity assumption hold. Regarding the first plot, it is seen that the blue line is close to a horizontal line centered around zero. Hence, this assumption is not massively violated. The second plot reveals whether the normality assumption holds, considering that for the most part the diagonal line is followed, we conclude that the normality assumption is not violated. Regarding the third graph, it is seen that the blue line is less steep than the previously estimated model, hence there is less heteroskedasticity, yet it is seen that for higher fitted values, the error seems to be lower. 
+
+*Note. Although, we have tried to remove outliers, the model has been calculated using a different number of observations than that which were in the data. Deletion of all NA entries did not suffice to have the same amount of observations. This is crucial in order to compute all outliers per observation and subsequentially remove all outliers above a certain treshold.*
+
+``` {r}
+autoplot(reg_1,
+         which = 1:3,
+         nrow = 1,
+         ncol = 3)
+```
+
