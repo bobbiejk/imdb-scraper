@@ -51,7 +51,7 @@ In order to use OLS, the following assumptions need to be satisfied: (i) linear 
 
 Regarding the third assumption, the table below depicts the correlation matrix, which shows that none of the correlation exceeds the 0.80 treshold of multicollinearity, except for the quadratic terms, which is intuitive considering that it is just a transformation of the same variable. 
 
-``` {r include=FALSE}
+``` {r, echo=FALSE}
 # delete the id and review_date row
 reviews_corr <- reviews_df[ , -c(1:2)]
 
@@ -61,7 +61,7 @@ cor(reviews_corr, use= "complete.obs" )
 The fourth, fifth and sixth assumption are tested by checking plots of the residual. Although the blue line in the first plot seems to be horizontal, an assessment cannot be made considering that there are outliers that should be removed in order to make a more informed assessment (see note.) Hence, due to the massive outliers seen in plot 1, we assume that there is a violation the zero conditional mean assumption which states that conditional on the explanatory variables, the error term should have an expectation of zero. The fifth assumption of normality is also violated, considering that that the plotted standardized residuals are off the diagonal. Also, the homoskedasticity assumption is violated as the blue line is rather diagonal than a steep line, this implies that the error terms vary across observations. 
 
 *Note. Although, we have tried to remove outliers, the model has been calculated using a different number of observations than that which were in the data. Deletion of all NA entries did not suffice to have the same amount of observations. This is crucial in order to compute all outliers per observation and subsequentially remove all outliers above a certain treshold.*
-``` {r}
+``` {r, echo=FALSE}
 autoplot(reg_1,
          which = 1:3,
          nrow = 1,
@@ -73,7 +73,7 @@ autoplot(reg_1,
 
 ### Full model
 
-Regressing the review rating on the same variables shows that original has a positive effect on the review rating, whereas exclusive and simultaneous released content has a negative impact on the review rating. Since exclusive rights may be expensive, likeability of shows should be assessed in order to provide consumers with valuable content. Simultaneous released content may have a negative impact on review rating as it may decrease suspense as the consumer does not have to wait for an entire week for the next release. Also, it is found that those consumers that write a review within a week of teh release date have a higher rating than those that write a review later. Hence, this may imply that fans - who are assumed to watch the content as soon as it comes out - have higher ratings than the average consumer. Contrarily to the regression on number of reviews, it is found that duration between release date and review date has a positive effect on review rating, although at some point in time this relationship becomes negative. An explanation of this finding may be the shift in cultural norms over time. 
+Regressing the review rating on the same variables shows that original has a positive effect on the review rating, whereas exclusive and simultaneous released content has a negative impact on the review rating. Since exclusive rights may be expensive, likeability of shows should be assessed in order to provide consumers with valuable content. Simultaneous released content may have a negative impact on review rating as it may decrease suspense as the consumer does not have to wait for an entire week for the next release. Also, it is found that those consumers that write a review within a week of the release date have a higher rating than those that write a review later. Hence, this may imply that fans - who are assumed to watch the content as soon as it comes out - have higher ratings than the average consumer. Contrarily to the regression on number of reviews, it is found that duration between release date and review date has a positive effect on review rating, although at some point in time this relationship becomes negative. An explanation of this finding may be the shift in cultural norms over time. 
 
 *Note. As seen in the descriptive analysis, the review rating decreased over time with the lowest point in 2018. After this the review rating increased a little. We have accounted for this in the model using trend and its quadratic term. The outcome implies that the review rating has convex relationship.*
 
@@ -82,7 +82,7 @@ Regressing the review rating on the same variables shows that original has a pos
 # regression analysis
 reg_2 <- lm(reviews_df$review_rating_weekly ~ reviews_df$exclusive + reviews_df$original + reviews_df$releasing + reviews_df$simultaneous + reviews_df$duration + reviews_df$quad_dur + reviews_df$trend + reviews_df$quad_trend, data = reviews_df)
 
-summary(reg_2)  
+summary(reg_2) 
 ```
 
 ### Model assumptions
@@ -91,8 +91,8 @@ Again, the model has been specified so that the parameters are linear and the da
 
 *Note. Although, we have tried to remove outliers, the model has been calculated using a different number of observations than that which were in the data. Deletion of all NA entries did not suffice to have the same amount of observations. This is crucial in order to compute all outliers per observation and subsequentially remove all outliers above a certain treshold.*
 
-``` {r}
-autoplot(reg_1,
+``` {r, echo=FALSE}
+autoplot(reg_2,
          which = 1:3,
          nrow = 1,
          ncol = 3)
