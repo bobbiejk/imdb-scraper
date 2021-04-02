@@ -24,14 +24,16 @@ load("../../gen/data-preparation/temp/transform_releases.RData")
 
 First, the content library over the years is measured including only those observations that have "Netflix" in their list of distributors for that particular year. The results are summarized in the table below. As you can see, the IMDb data has an under representation of the actual content library, especially in the earlier years.
 
-```{r}
+```{r, include = FALSE}
 # merge orginals to exclusives to depict over distributor years which content is exclusive.
 content_df <- exclusive_df %>%
   left_join(originals_df, by="id")
 
 # get rid of titles that are in production
 content_df <- content_df[!(content_df$exclusive == 0 & content_df$original == 1),]
+```
 
+```{r}
 # number of content over the years
 content_df %>%
   group_by(year) %>%
@@ -44,13 +46,6 @@ content_df %>%
 Over the years, it has become increasingly important to gain a competitive advantage by building a unique content library for all streaming services. This can be accomplished by (a) acquiring licensed, but exclusive content or (b) producing original content. The following table exhibits the number of exclusive and original titles over the years. Intuitively, the ratio of exclusive content is higher than the ratio of orginal content since all original shows are exclusives, yet acquired content may also be exclusive.
 
 ```{r}
-# merge orginals to exclusives to depict over distributor years which content is exclusive.
-content_df <- exclusive_df %>%
-  left_join(originals_df, by="id")
-
-# get rid of titles that are in production
-content_df <- content_df[!(content_df$exclusive == 0 & content_df$original == 1),]
-
 content_df %>%
   group_by(year) %>%
   filter(year >= 2007,
@@ -62,6 +57,7 @@ content_df %>%
             ratio_original = original /n)
 
 ```
+
 ## Releasing strategy
 
 Streaming services often go against the release strategy that is typical for linear television. That is, often on streaming services, all episodes of one show for an entire season is dropped simultaneously. In order to demonstrate this phenomena, the following table showcasts how the strategy of simultaneously dropping an entire season has been popularized over the years. 
@@ -87,12 +83,14 @@ releases_df %>%
 
 Over the years, more reviews have been written on IMDb. Although over the last couple of years, this growth in reviews has also been subjected to greater variation. This might imply that popularity of particular content may heavily increase number of reviews written in a certain month.
 
-``` {r}
+``` {r, include = FALSE}
 # function to ensure that every nth tick is visible on x-axis
 every_nth = function(n) {
   return(function(x) {x[c(TRUE, rep(FALSE, n - 1))]})
 }
+```
 
+``` {r}
 reviews_df %>%
   mutate(months = format(review_data, "%Y-%m")) %>%
   group_by(months) %>%
