@@ -45,8 +45,9 @@ gen/data-preparation/temp/transform_distributors.RData: gen/data-preparation/inp
 
 # raw data inspection
 
-gen/data-preparation/output/raw_inspection.html: src/data-preparation/raw_inspection.Rmd 
-	R -e "rmarkdown::render('src/data-preparation/raw_inspection.Rmd', output_file = 'gen/data-preparation/output/raw_inspection.html')"
+gen/data-preparation/output/raw_inspection.html: src/data-preparation/update_output.R src/data-preparation/raw_inspection.Rmd 
+	RScript src/data-preparation/update_output.R
+	R -e "rmarkdown::render('src/data-preparation/raw_inspection.Rmd', output_file = '../../gen/data-preparation/output/raw_inspection.html')"
 
 # set data to gen/data-preparation/input
 
