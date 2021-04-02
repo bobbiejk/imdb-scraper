@@ -1,8 +1,15 @@
-all: input transform merge input2
+all: input transform merge descriptives input2 analysis
 input: gen/data-preparation/input/distributors.csv
 transform: gen/data-preparation/temp/transform_distributors.RData gen/data-preparation/temp/transform_producers.RData gen/data-preparation/temp/transform_releases.RData gen/data-preparation/temp/transform_reviews.RData
 merge: gen/data-preparation/output/reviews.RData
+descriptives: gen/data-preparation/output/descriptives.html
 input2: gen/analysis/input/reviews.RData
+analysis: gen/analysis/output/analysis.html
+
+# regression analysis
+
+gen/analysis/output/analysis.html: src/analysis/analysis.Rmd 
+	R -e "rmarkdown::render('src/analysis/analysis.Rmd', output_file = '../../gen/analysis/output/analysis.html')"
 
 # set data to gen/analysis/input
 
@@ -12,7 +19,7 @@ gen/analysis/input/reviews.RData: src/analysis/update_input.R
 # descriptive analysis after data preparation
 
 gen/data-preparation/output/descriptives.html: src/data-preparation/descriptives.Rmd 
-	R -e "rmarkdown::render('src/data-preparation/descriptives.Rmd', output_file = 'gen/data-preparation/output/descriptives.html')"
+	R -e "rmarkdown::render('src/data-preparation/descriptives.Rmd', output_file = '../../gen/data-preparation/output/descriptives.html')"
 
 # merge data
 
