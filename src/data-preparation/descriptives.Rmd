@@ -90,7 +90,7 @@ every_nth = function(n) {
 }
 ```
 
-``` {r}
+``` {r, echo=FALSE}
 reviews_df %>%
   mutate(months = format(review_data, "%Y-%m")) %>%
   group_by(months) %>%
@@ -106,7 +106,7 @@ reviews_df %>%
 
 Although the ratings have gone up over the last years, the trend in the average rating is going down and there is also less variation over the months. Currently, content is scoring around a seven on average.
 
-``` {r} 
+``` {r, echo=FALSE} 
 reviews_df %>%
   mutate(months = format(review_data, "%Y-%m")) %>%
   group_by(months) %>%
