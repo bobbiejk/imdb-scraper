@@ -47,8 +47,8 @@ only original content has a positive effect.
 
 ## Repository overview
 
-\src\collection         <- collect data from imdb and tmdb
-\src\data-preparation   <- transform the raw data into usable variables for regression
+\src\collection         <- collect data from imdb and tmdb\
+\src\data-preparation   <- transform the raw data into usable variables for regression\
 \src\analysis           <- regress the data
 
 ## Running instructions
