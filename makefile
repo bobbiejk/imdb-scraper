@@ -8,7 +8,8 @@ analysis: gen/analysis/output/analysis.html
 
 # regression analysis
 
-gen/analysis/output/analysis.html: src/analysis/analysis.Rmd 
+gen/analysis/output/analysis.html: src/analysis/update_output.R src/analysis/analysis.Rmd 
+	RScript src/analysis/update_output.R
 	R -e "rmarkdown::render('src/analysis/analysis.Rmd', output_file = '../../gen/analysis/output/analysis.html')"
 
 # set data to gen/analysis/input
