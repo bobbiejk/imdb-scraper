@@ -19,8 +19,8 @@ dir.create("data/tmdb")
 
 # write to data map
 write.csv(distributors, "./data/imdb/distributors.csv")
-write.csv(distributors, "./data/imdb/producers.csv")
-write.csv(distributors, "./data/imdb/content.csv")
-write.csv(distributors, "./data/imdb/reviews.csv")
-write.csv(distributors, "./data/tmdb/releases.csv")
+write.csv(producers, "./data/imdb/producers.csv")
+write.csv(content, "./data/imdb/content.csv")
+write.csv(reviews, "./data/imdb/reviews.csv")
+write.csv(releases, "./data/tmdb/releases.csv")
 
